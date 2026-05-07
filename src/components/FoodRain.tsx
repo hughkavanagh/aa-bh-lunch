@@ -14,7 +14,7 @@ export default function FoodRain({
   imageUrls,
   active,
   onDone,
-  count = 20,
+  count = 25,
 }: FoodRainProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<Matter.Engine | null>(null);
@@ -119,7 +119,7 @@ export default function FoodRain({
     preloadImages(urls).then((imgMap) => {
       imagesRef.current = imgMap;
 
-      const size = Math.min(w, h) * 0.09;
+      const size = Math.min(w, h) * 0.117;
       const radius = size / 2;
 
       // Stagger spawning
@@ -133,11 +133,9 @@ export default function FoodRain({
             restitution: 0.4,
             friction: 0.3,
             density: 0.002,
+            inertia: Infinity,
             label: `food-${i}`,
           });
-
-          // Give a slight random spin
-          Matter.Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.15);
 
           bodiesRef.current.push(body);
           Matter.Composite.add(engineRef.current!.world, body);
@@ -163,7 +161,6 @@ export default function FoodRain({
 
         ctx.save();
         ctx.translate(x, y);
-        ctx.rotate(body.angle);
         ctx.drawImage(img, -size / 2, -size / 2, size, size);
         ctx.restore();
       }

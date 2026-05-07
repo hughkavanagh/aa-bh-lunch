@@ -20,7 +20,7 @@ export default function ReviewItem({
     <div className="flex items-start justify-between py-3 border-t border-border/60">
       <div className="flex gap-3">
         {review.image_url && (
-          <div className="w-12 h-12 shrink-0">
+          <div className="w-16 h-16 shrink-0 self-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={review.image_url}

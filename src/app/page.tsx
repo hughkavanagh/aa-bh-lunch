@@ -227,7 +227,7 @@ function HomeContent() {
           {foodImageUrls.length > 0 && (
             <button
               onClick={() => setFoodRainActive((v) => !v)}
-              className="text-lg leading-none hover:scale-125 transition-transform"
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-border/20 border border-border/40 text-base leading-none hover:scale-110 hover:bg-border/40 transition-all"
               title={foodRainActive ? "Clear plates" : "Make it rain"}
             >
               🍽️
