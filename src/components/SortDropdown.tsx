@@ -3,6 +3,7 @@
 import type { SortField, SortDirection } from "@/types";
 
 const SORT_OPTIONS: { label: string; field: SortField }[] = [
+  { label: "Name", field: "name" },
   { label: "Rating", field: "avg_rating" },
   { label: "Price", field: "avg_price" },
   { label: "Walk time", field: "walk_minutes" },

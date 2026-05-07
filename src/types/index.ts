@@ -34,6 +34,7 @@ export interface ResolvedPlace {
 }
 
 export type SortField =
+  | "name"
   | "avg_rating"
   | "avg_price"
   | "walk_minutes"

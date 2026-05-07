@@ -49,31 +49,31 @@ export default function PlaceRow({
             {place.name}
           </a>
         </td>
-        <td className="py-3 px-4 font-mono text-right">
+        <td className="py-3 px-4 font-mono">
           {unreviewed ? (
             <span className="text-muted text-xs tracking-wider">UNREVIEWED</span>
           ) : (
             place.review_count > 0 ? place.avg_rating.toFixed(1) : "—"
           )}
         </td>
-        <td className="py-3 px-4 font-mono text-right">
+        <td className="py-3 px-4 font-mono">
           {unreviewed ? (
             <span className="text-muted text-xs tracking-wider">UNREVIEWED</span>
           ) : (
             place.review_count > 0 ? formatPrice(place.avg_price) : "—"
           )}
         </td>
-        <td className="py-3 px-4 font-mono text-right whitespace-nowrap">
+        <td className="py-3 px-4 font-mono whitespace-nowrap">
           {place.walk_minutes} min
         </td>
-        <td className="py-3 px-4 font-mono text-right">
+        <td className="py-3 px-4 font-mono">
           {unreviewed ? (
             <span className="text-muted text-xs tracking-wider">UNREVIEWED</span>
           ) : (
             place.review_count > 0 ? place.rating_per_dollar.toFixed(1) : "—"
           )}
         </td>
-        <td className="py-3 px-4 text-right text-muted text-sm">
+        <td className="py-3 px-4 text-muted text-sm">
           {place.review_count}
         </td>
         <td className="py-3 px-2">

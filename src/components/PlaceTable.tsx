@@ -3,8 +3,8 @@
 import type { PlaceWithStats, SortField, SortDirection, Review } from "@/types";
 import PlaceRow from "./PlaceRow";
 
-const COLUMNS: { label: string; field: SortField | null }[] = [
-  { label: "Place", field: null },
+const COLUMNS: { label: string; field: SortField }[] = [
+  { label: "Place", field: "name" },
   { label: "Rating", field: "avg_rating" },
   { label: "Avg Price", field: "avg_price" },
   { label: "Walk", field: "walk_minutes" },
@@ -53,25 +53,21 @@ export default function PlaceTable({
             {COLUMNS.map((col) => (
               <th
                 key={col.label}
-                onClick={col.field ? () => onSort(col.field!) : undefined}
-                className={`py-3 px-4 text-xs font-medium tracking-widest uppercase text-muted whitespace-nowrap ${
-                  col.field ? "cursor-pointer hover:text-fg select-none" : ""
-                } ${col.field ? "text-right" : "text-left"}`}
+                onClick={() => onSort(col.field)}
+                className="py-3 px-4 text-xs font-medium tracking-widest uppercase text-muted whitespace-nowrap cursor-pointer hover:text-fg select-none text-left"
               >
                 {col.label}
-                {col.field && (
-                  <span
-                    className={`ml-1 inline-block w-3 ${
-                      sortField === col.field ? "text-accent" : "text-transparent"
-                    }`}
-                  >
-                    {sortField === col.field
-                      ? sortDirection === "asc"
-                        ? "↑"
-                        : "↓"
-                      : "↓"}
-                  </span>
-                )}
+                <span
+                  className={`ml-1 inline-block w-3 ${
+                    sortField === col.field ? "text-accent" : "text-transparent"
+                  }`}
+                >
+                  {sortField === col.field
+                    ? sortDirection === "asc"
+                      ? "↑"
+                      : "↓"
+                    : "↓"}
+                </span>
               </th>
             ))}
             <th className="w-20" />

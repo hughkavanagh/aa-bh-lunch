@@ -68,26 +68,37 @@ function HomeContent() {
     [places]
   );
 
-  const unreviewedPlaces = useMemo(
-    () => places.filter((p) => p.review_count === 0),
-    [places]
+  const sortPlaces = useCallback(
+    (list: PlaceWithStats[]) => {
+      return [...list].sort((a, b) => {
+        const mult = sortDirection === "asc" ? 1 : -1;
+        if (sortField === "name") {
+          return a.name.localeCompare(b.name) * mult;
+        }
+        return (Number(a[sortField]) - Number(b[sortField])) * mult;
+      });
+    },
+    [sortField, sortDirection]
   );
 
+  const unreviewedPlaces = useMemo(() => {
+    const list = places.filter((p) => p.review_count === 0);
+    if (sortField === "name" || sortField === "walk_minutes") {
+      return sortPlaces(list);
+    }
+    return list;
+  }, [places, sortField, sortDirection, sortPlaces]);
+
   const sorted = useMemo(() => {
-    return [...reviewedPlaces].sort((a, b) => {
-      const aVal = a[sortField];
-      const bVal = b[sortField];
-      const mult = sortDirection === "asc" ? 1 : -1;
-      return (Number(aVal) - Number(bVal)) * mult;
-    });
-  }, [reviewedPlaces, sortField, sortDirection]);
+    return sortPlaces(reviewedPlaces);
+  }, [reviewedPlaces, sortPlaces]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
       setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
     } else {
       setSortField(field);
-      setSortDirection("desc");
+      setSortDirection(field === "name" || field === "walk_minutes" ? "asc" : "desc");
     }
   };
 
