@@ -15,6 +15,7 @@ interface PlaceRowProps {
   onAddReview: () => void;
   onDeletePlace: () => void;
   onMovePlace: () => void;
+  onRenamePlace: () => void;
   unreviewed?: boolean;
 }
 
@@ -29,6 +30,7 @@ export default function PlaceRow({
   onAddReview,
   onDeletePlace,
   onMovePlace,
+  onRenamePlace,
   unreviewed,
 }: PlaceRowProps) {
   const canExpand = !unreviewed || isAdmin;
@@ -38,7 +40,7 @@ export default function PlaceRow({
         onClick={canExpand ? onToggle : undefined}
         className={`${canExpand ? "cursor-pointer" : ""} hover:bg-border/20 transition-colors border-b border-border/60`}
       >
-        <td className="py-3 px-4">
+        <td className="py-3 px-5">
           <a
             href={place.google_maps_url}
             target="_blank"
@@ -49,31 +51,31 @@ export default function PlaceRow({
             {place.name}
           </a>
         </td>
-        <td className="py-3 px-4 font-mono">
+        <td className="py-3 px-5 font-mono">
           {unreviewed ? (
-            <span className="text-muted text-xs tracking-wider">UNREVIEWED</span>
+            <span className="text-muted/40 text-xs tracking-wider">UNREVIEWED</span>
           ) : (
             place.review_count > 0 ? place.avg_rating.toFixed(1) : "—"
           )}
         </td>
-        <td className="py-3 px-4 font-mono">
+        <td className="py-3 px-5 font-mono">
           {unreviewed ? (
-            <span className="text-muted text-xs tracking-wider">UNREVIEWED</span>
+            <span className="text-muted/40 text-xs tracking-wider">UNREVIEWED</span>
           ) : (
             place.review_count > 0 ? formatPrice(place.avg_price) : "—"
           )}
         </td>
-        <td className="py-3 px-4 font-mono whitespace-nowrap">
+        <td className="py-3 px-5 font-mono whitespace-nowrap">
           {place.walk_minutes} min
         </td>
-        <td className="py-3 px-4 font-mono">
+        <td className="py-3 px-5 font-mono">
           {unreviewed ? (
-            <span className="text-muted text-xs tracking-wider">UNREVIEWED</span>
+            <span className="text-muted/40 text-xs tracking-wider">UNREVIEWED</span>
           ) : (
             place.review_count > 0 ? place.rating_per_dollar.toFixed(1) : "—"
           )}
         </td>
-        <td className="py-3 px-4 text-muted text-sm">
+        <td className="py-3 px-5 text-muted text-sm">
           {place.review_count}
         </td>
         <td className="py-3 px-2">
@@ -118,6 +120,15 @@ export default function PlaceRow({
                 <span className="text-xs text-muted uppercase tracking-widest mr-auto">
                   Admin
                 </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onRenamePlace();
+                  }}
+                  className="text-xs text-muted hover:text-fg border border-border/60 rounded px-2 py-1 hover:border-fg/30 transition-colors"
+                >
+                  Rename
+                </button>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();

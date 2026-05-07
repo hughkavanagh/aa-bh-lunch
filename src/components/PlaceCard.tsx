@@ -15,6 +15,7 @@ interface PlaceCardProps {
   onAddReview: () => void;
   onDeletePlace: () => void;
   onMovePlace: () => void;
+  onRenamePlace: () => void;
   unreviewed?: boolean;
 }
 
@@ -29,6 +30,7 @@ export default function PlaceCard({
   onAddReview,
   onDeletePlace,
   onMovePlace,
+  onRenamePlace,
   unreviewed,
 }: PlaceCardProps) {
   const canExpand = !unreviewed || isAdmin;
@@ -71,7 +73,7 @@ export default function PlaceCard({
                 {place.walk_minutes} min
                 <span className="text-muted ml-1 font-sans text-xs">walk</span>
               </span>
-              <span className="text-muted text-xs self-center uppercase tracking-wider">
+              <span className="text-muted/40 text-xs self-center uppercase tracking-wider">
                 Unreviewed
               </span>
             </>
@@ -116,6 +118,12 @@ export default function PlaceCard({
               <span className="text-xs text-muted uppercase tracking-widest mr-auto">
                 Admin
               </span>
+              <button
+                onClick={onRenamePlace}
+                className="text-xs text-muted hover:text-fg border border-border/60 rounded px-2 py-1 hover:border-fg/30 transition-colors"
+              >
+                Rename
+              </button>
               <button
                 onClick={onMovePlace}
                 className="text-xs text-muted hover:text-fg border border-border/60 rounded px-2 py-1 hover:border-fg/30 transition-colors"

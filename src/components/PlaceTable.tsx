@@ -26,6 +26,7 @@ interface PlaceTableProps {
   onAddReview: (place: PlaceWithStats) => void;
   onDeletePlace: (place: PlaceWithStats) => void;
   onMovePlace: (place: PlaceWithStats) => void;
+  onRenamePlace: (place: PlaceWithStats) => void;
   unreviewedPlaces?: PlaceWithStats[];
 }
 
@@ -43,18 +44,29 @@ export default function PlaceTable({
   onAddReview,
   onDeletePlace,
   onMovePlace,
+  onRenamePlace,
   unreviewedPlaces,
 }: PlaceTableProps) {
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
+        <colgroup>
+          <col style={{ width: "20%" }} />
+          <col />
+          <col />
+          <col />
+          <col />
+          <col style={{ width: "5%" }} />
+          <col style={{ width: "80px" }} />
+          <col style={{ width: "32px" }} />
+        </colgroup>
         <thead>
           <tr className="border-b-2 border-border">
             {COLUMNS.map((col) => (
               <th
                 key={col.label}
                 onClick={() => onSort(col.field)}
-                className="py-3 px-4 text-xs font-medium tracking-widest uppercase text-muted whitespace-nowrap cursor-pointer hover:text-fg select-none text-left"
+                className="py-3 px-5 text-xs font-medium tracking-widest uppercase text-muted whitespace-nowrap cursor-pointer hover:text-fg select-none text-left"
               >
                 {col.label}
                 <span
@@ -70,8 +82,8 @@ export default function PlaceTable({
                 </span>
               </th>
             ))}
-            <th className="w-20" />
-            <th className="w-8" />
+            <th />
+            <th />
           </tr>
         </thead>
         <tbody>
@@ -88,6 +100,7 @@ export default function PlaceTable({
               onAddReview={() => onAddReview(place)}
               onDeletePlace={() => onDeletePlace(place)}
               onMovePlace={() => onMovePlace(place)}
+              onRenamePlace={() => onRenamePlace(place)}
             />
           ))}
         </tbody>
@@ -95,9 +108,9 @@ export default function PlaceTable({
           <>
             <tbody>
               <tr>
-                <td colSpan={8} className="pt-8 pb-4 px-4">
-                  <div className="border-t border-muted/30" />
-                  <p className="text-xs uppercase tracking-widest text-muted font-medium mt-4">
+                <td colSpan={8} className="pt-14 pb-4 px-5">
+                  <div className="border-t border-muted/20" />
+                  <p className="text-xs uppercase tracking-widest text-muted/50 font-medium mt-4">
                     Unreviewed
                   </p>
                 </td>
@@ -117,6 +130,7 @@ export default function PlaceTable({
                   onAddReview={() => onAddReview(place)}
                   onDeletePlace={() => onDeletePlace(place)}
                   onMovePlace={() => onMovePlace(place)}
+                  onRenamePlace={() => onRenamePlace(place)}
                   unreviewed
                 />
               ))}

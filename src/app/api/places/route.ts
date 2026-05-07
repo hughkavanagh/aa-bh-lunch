@@ -3,7 +3,7 @@ import { createServiceClient } from "@/lib/supabase";
 
 export async function PUT(req: NextRequest) {
   try {
-    const { password, place_id, category } = await req.json();
+    const { password, place_id, category, name } = await req.json();
 
     if (password !== process.env.ADMIN_PASSWORD) {
       return NextResponse.json({ error: "Wrong password" }, { status: 401 });
@@ -13,18 +13,33 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Missing place ID" }, { status: 400 });
     }
 
-    if (category !== "lunch" && category !== "cafe") {
+    if (category !== undefined && category !== "lunch" && category !== "cafe") {
       return NextResponse.json(
         { error: "Invalid category" },
         { status: 400 }
       );
     }
 
+    if (name !== undefined && (!name || typeof name !== "string" || !name.trim())) {
+      return NextResponse.json(
+        { error: "Name cannot be empty" },
+        { status: 400 }
+      );
+    }
+
+    const updates: Record<string, unknown> = {};
+    if (category !== undefined) updates.category = category;
+    if (name !== undefined) updates.name = name.trim();
+
+    if (Object.keys(updates).length === 0) {
+      return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
+    }
+
     const db = createServiceClient();
 
     const { error } = await db
       .from("places")
-      .update({ category })
+      .update(updates)
       .eq("id", place_id);
 
     if (error) {

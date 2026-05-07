@@ -173,6 +173,24 @@ function HomeContent() {
     if (res.ok) fetchPlaces();
   };
 
+  const handleRenamePlace = async (place: PlaceWithStats) => {
+    const newName = prompt("Rename this place:", place.name);
+    if (!newName || newName.trim() === place.name) return;
+    if (!adminPassword) return;
+
+    const res = await fetch("/api/places", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        password: adminPassword,
+        place_id: place.id,
+        name: newName.trim(),
+      }),
+    });
+
+    if (res.ok) fetchPlaces();
+  };
+
   const handleAdminUnlock = (pw: string) => {
     setIsAdmin(true);
     setAdminPassword(pw);
@@ -266,6 +284,7 @@ function HomeContent() {
               onAddReview={(place) => setReviewingPlace(place)}
               onDeletePlace={handleDeletePlace}
               onMovePlace={handleMovePlace}
+              onRenamePlace={handleRenamePlace}
               unreviewedPlaces={unreviewedPlaces}
             />
           </div>
@@ -285,13 +304,14 @@ function HomeContent() {
                 onAddReview={() => setReviewingPlace(place)}
                 onDeletePlace={() => handleDeletePlace(place)}
                 onMovePlace={() => handleMovePlace(place)}
+                onRenamePlace={() => handleRenamePlace(place)}
               />
             ))}
             {unreviewedPlaces.length > 0 && (
               <>
-                <div className="mt-6 mb-2">
-                  <div className="border-t border-muted/30" />
-                  <p className="text-xs uppercase tracking-widest text-muted font-medium mt-3">
+                <div className="mt-10 mb-2">
+                  <div className="border-t border-muted/20" />
+                  <p className="text-xs uppercase tracking-widest text-muted/50 font-medium mt-3">
                     Unreviewed
                   </p>
                 </div>
@@ -310,6 +330,7 @@ function HomeContent() {
                     onAddReview={() => setReviewingPlace(place)}
                     onDeletePlace={() => handleDeletePlace(place)}
                     onMovePlace={() => handleMovePlace(place)}
+                    onRenamePlace={() => handleRenamePlace(place)}
                     unreviewed
                   />
                 ))}
