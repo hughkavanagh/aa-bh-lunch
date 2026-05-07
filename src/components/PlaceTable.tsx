@@ -24,6 +24,8 @@ interface PlaceTableProps {
   onEditReview: (review: Review) => void;
   onDeleteReview: (review: Review) => void;
   onAddReview: (place: PlaceWithStats) => void;
+  onDeletePlace: (place: PlaceWithStats) => void;
+  onMovePlace: (place: PlaceWithStats) => void;
   unreviewedPlaces?: PlaceWithStats[];
 }
 
@@ -39,6 +41,8 @@ export default function PlaceTable({
   onEditReview,
   onDeleteReview,
   onAddReview,
+  onDeletePlace,
+  onMovePlace,
   unreviewedPlaces,
 }: PlaceTableProps) {
   return (
@@ -50,14 +54,22 @@ export default function PlaceTable({
               <th
                 key={col.label}
                 onClick={col.field ? () => onSort(col.field!) : undefined}
-                className={`py-3 px-4 text-xs font-medium tracking-widest uppercase text-muted ${
+                className={`py-3 px-4 text-xs font-medium tracking-widest uppercase text-muted whitespace-nowrap ${
                   col.field ? "cursor-pointer hover:text-fg select-none" : ""
                 } ${col.field ? "text-right" : "text-left"}`}
               >
                 {col.label}
-                {col.field && sortField === col.field && (
-                  <span className="ml-1 text-accent">
-                    {sortDirection === "asc" ? "↑" : "↓"}
+                {col.field && (
+                  <span
+                    className={`ml-1 inline-block w-3 ${
+                      sortField === col.field ? "text-accent" : "text-transparent"
+                    }`}
+                  >
+                    {sortField === col.field
+                      ? sortDirection === "asc"
+                        ? "↑"
+                        : "↓"
+                      : "↓"}
                   </span>
                 )}
               </th>
@@ -78,6 +90,8 @@ export default function PlaceTable({
               onEditReview={onEditReview}
               onDeleteReview={onDeleteReview}
               onAddReview={() => onAddReview(place)}
+              onDeletePlace={() => onDeletePlace(place)}
+              onMovePlace={() => onMovePlace(place)}
             />
           ))}
         </tbody>
@@ -98,13 +112,15 @@ export default function PlaceTable({
                 <PlaceRow
                   key={place.id}
                   place={place}
-                  expanded={false}
-                  onToggle={() => {}}
+                  expanded={expandedId === place.id}
+                  onToggle={() => onToggle(place.id)}
                   myReviewIds={myReviewIds}
                   isAdmin={isAdmin}
                   onEditReview={onEditReview}
                   onDeleteReview={onDeleteReview}
                   onAddReview={() => onAddReview(place)}
+                  onDeletePlace={() => onDeletePlace(place)}
+                  onMovePlace={() => onMovePlace(place)}
                   unreviewed
                 />
               ))}

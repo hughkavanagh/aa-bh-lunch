@@ -13,6 +13,8 @@ interface PlaceCardProps {
   onEditReview: (review: Review) => void;
   onDeleteReview: (review: Review) => void;
   onAddReview: () => void;
+  onDeletePlace: () => void;
+  onMovePlace: () => void;
   unreviewed?: boolean;
 }
 
@@ -25,8 +27,11 @@ export default function PlaceCard({
   onEditReview,
   onDeleteReview,
   onAddReview,
+  onDeletePlace,
+  onMovePlace,
   unreviewed,
 }: PlaceCardProps) {
+  const canExpand = !unreviewed || isAdmin;
   return (
     <div className="border border-border/60 rounded-lg bg-surface overflow-hidden">
       <div className="w-full text-left p-4">
@@ -46,7 +51,7 @@ export default function PlaceCard({
             >
               + Review
             </button>
-            {!unreviewed && (
+            {canExpand && (
               <button onClick={onToggle} className="p-1">
                 <span
                   className={`text-muted transition-transform inline-block ${
@@ -95,15 +100,36 @@ export default function PlaceCard({
           )}
         </div>
       </div>
-      {expanded && !unreviewed && (
+      {expanded && (
         <div className="border-t border-border/60">
-          <ReviewList
-            reviews={place.reviews}
-            myReviewIds={myReviewIds}
-            isAdmin={isAdmin}
-            onEdit={onEditReview}
-            onDelete={onDeleteReview}
-          />
+          {!unreviewed && (
+            <ReviewList
+              reviews={place.reviews}
+              myReviewIds={myReviewIds}
+              isAdmin={isAdmin}
+              onEdit={onEditReview}
+              onDelete={onDeleteReview}
+            />
+          )}
+          {isAdmin && (
+            <div className="flex items-center gap-3 px-4 py-3 border-t border-border/40">
+              <span className="text-xs text-muted uppercase tracking-widest mr-auto">
+                Admin
+              </span>
+              <button
+                onClick={onMovePlace}
+                className="text-xs text-muted hover:text-fg border border-border/60 rounded px-2 py-1 hover:border-fg/30 transition-colors"
+              >
+                Move to {place.category === "lunch" ? "Cafe" : "Lunch"}
+              </button>
+              <button
+                onClick={onDeletePlace}
+                className="text-xs text-accent hover:text-accent/80 border border-accent/30 rounded px-2 py-1 hover:border-accent/60 transition-colors"
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

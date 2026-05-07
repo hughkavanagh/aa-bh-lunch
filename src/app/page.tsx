@@ -131,6 +131,37 @@ function HomeContent() {
     }
   };
 
+  const handleDeletePlace = async (place: PlaceWithStats) => {
+    if (!confirm(`Delete "${place.name}" and all its reviews?`)) return;
+    if (!adminPassword) return;
+
+    const res = await fetch("/api/places", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: adminPassword, place_id: place.id }),
+    });
+
+    if (res.ok) fetchPlaces();
+  };
+
+  const handleMovePlace = async (place: PlaceWithStats) => {
+    const target = place.category === "lunch" ? "cafe" : "lunch";
+    if (!confirm(`Move "${place.name}" to ${target}?`)) return;
+    if (!adminPassword) return;
+
+    const res = await fetch("/api/places", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        password: adminPassword,
+        place_id: place.id,
+        category: target,
+      }),
+    });
+
+    if (res.ok) fetchPlaces();
+  };
+
   const handleAdminUnlock = (pw: string) => {
     setIsAdmin(true);
     setAdminPassword(pw);
@@ -222,6 +253,8 @@ function HomeContent() {
               onEditReview={setEditingReview}
               onDeleteReview={handleDeleteReview}
               onAddReview={(place) => setReviewingPlace(place)}
+              onDeletePlace={handleDeletePlace}
+              onMovePlace={handleMovePlace}
               unreviewedPlaces={unreviewedPlaces}
             />
           </div>
@@ -239,6 +272,8 @@ function HomeContent() {
                 onEditReview={setEditingReview}
                 onDeleteReview={handleDeleteReview}
                 onAddReview={() => setReviewingPlace(place)}
+                onDeletePlace={() => handleDeletePlace(place)}
+                onMovePlace={() => handleMovePlace(place)}
               />
             ))}
             {unreviewedPlaces.length > 0 && (
@@ -253,13 +288,17 @@ function HomeContent() {
                   <PlaceCard
                     key={place.id}
                     place={place}
-                    expanded={false}
-                    onToggle={() => {}}
+                    expanded={expandedId === place.id}
+                    onToggle={() =>
+                      setExpandedId(expandedId === place.id ? null : place.id)
+                    }
                     myReviewIds={myReviewIds}
                     isAdmin={isAdmin}
                     onEditReview={setEditingReview}
                     onDeleteReview={handleDeleteReview}
                     onAddReview={() => setReviewingPlace(place)}
+                    onDeletePlace={() => handleDeletePlace(place)}
+                    onMovePlace={() => handleMovePlace(place)}
                     unreviewed
                   />
                 ))}

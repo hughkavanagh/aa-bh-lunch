@@ -13,6 +13,8 @@ interface PlaceRowProps {
   onEditReview: (review: Review) => void;
   onDeleteReview: (review: Review) => void;
   onAddReview: () => void;
+  onDeletePlace: () => void;
+  onMovePlace: () => void;
   unreviewed?: boolean;
 }
 
@@ -25,13 +27,16 @@ export default function PlaceRow({
   onEditReview,
   onDeleteReview,
   onAddReview,
+  onDeletePlace,
+  onMovePlace,
   unreviewed,
 }: PlaceRowProps) {
+  const canExpand = !unreviewed || isAdmin;
   return (
     <>
       <tr
-        onClick={unreviewed ? undefined : onToggle}
-        className={`${unreviewed ? "" : "cursor-pointer"} hover:bg-border/20 transition-colors border-b border-border/60`}
+        onClick={canExpand ? onToggle : undefined}
+        className={`${canExpand ? "cursor-pointer" : ""} hover:bg-border/20 transition-colors border-b border-border/60`}
       >
         <td className="py-3 px-4">
           <a
@@ -58,7 +63,7 @@ export default function PlaceRow({
             place.review_count > 0 ? formatPrice(place.avg_price) : "—"
           )}
         </td>
-        <td className="py-3 px-4 font-mono text-right">
+        <td className="py-3 px-4 font-mono text-right whitespace-nowrap">
           {place.walk_minutes} min
         </td>
         <td className="py-3 px-4 font-mono text-right">
@@ -82,7 +87,7 @@ export default function PlaceRow({
             + Review
           </button>
         </td>
-        {!unreviewed && (
+        {canExpand ? (
           <td className="py-3 px-2 text-muted">
             <span
               className={`inline-block transition-transform ${
@@ -92,19 +97,47 @@ export default function PlaceRow({
               ›
             </span>
           </td>
+        ) : (
+          <td className="py-3 px-2" />
         )}
-        {unreviewed && <td className="py-3 px-2" />}
       </tr>
-      {expanded && !unreviewed && (
+      {expanded && (
         <tr>
           <td colSpan={8} className="bg-border/10">
-            <ReviewList
-              reviews={place.reviews}
-              myReviewIds={myReviewIds}
-              isAdmin={isAdmin}
-              onEdit={onEditReview}
-              onDelete={onDeleteReview}
-            />
+            {!unreviewed && (
+              <ReviewList
+                reviews={place.reviews}
+                myReviewIds={myReviewIds}
+                isAdmin={isAdmin}
+                onEdit={onEditReview}
+                onDelete={onDeleteReview}
+              />
+            )}
+            {isAdmin && (
+              <div className="flex items-center gap-3 px-4 py-3 border-t border-border/40">
+                <span className="text-xs text-muted uppercase tracking-widest mr-auto">
+                  Admin
+                </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMovePlace();
+                  }}
+                  className="text-xs text-muted hover:text-fg border border-border/60 rounded px-2 py-1 hover:border-fg/30 transition-colors"
+                >
+                  Move to {place.category === "lunch" ? "Cafe" : "Lunch"}
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeletePlace();
+                  }}
+                  className="text-xs text-accent hover:text-accent/80 border border-accent/30 rounded px-2 py-1 hover:border-accent/60 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            )}
           </td>
         </tr>
       )}
