@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
         rating,
         price,
         what_they_got: what_they_got || null,
+        image_url: body.image_url || null,
       })
       .select("id")
       .single();

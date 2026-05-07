@@ -16,6 +16,7 @@ export interface Review {
   rating: number;
   price: number;
   what_they_got: string | null;
+  image_url: string | null;
   created_at: string;
 }
 

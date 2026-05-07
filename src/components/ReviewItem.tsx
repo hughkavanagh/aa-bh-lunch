@@ -18,20 +18,32 @@ export default function ReviewItem({
 }: ReviewItemProps) {
   return (
     <div className="flex items-start justify-between py-3 border-t border-border/60">
-      <div className="flex flex-col gap-0.5">
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium">{review.reviewer_name}</span>
-          <span className="font-mono text-sm">{Number(review.rating).toFixed(1)}/10</span>
-          <span className="font-mono text-sm text-muted">
-            {formatPrice(Number(review.price))}
-          </span>
-        </div>
-        {review.what_they_got && (
-          <span className="text-sm italic text-muted">
-            {review.what_they_got}
-          </span>
+      <div className="flex gap-3">
+        {review.image_url && (
+          <div className="w-14 h-14 shrink-0 rounded-md overflow-hidden bg-border/20">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={review.image_url}
+              alt="Food photo"
+              className="w-full h-full object-contain"
+            />
+          </div>
         )}
-        <span className="text-xs text-muted">{timeAgo(review.created_at)}</span>
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium">{review.reviewer_name}</span>
+            <span className="font-mono text-sm">{Number(review.rating).toFixed(1)}/10</span>
+            <span className="font-mono text-sm text-muted">
+              {formatPrice(Number(review.price))}
+            </span>
+          </div>
+          {review.what_they_got && (
+            <span className="text-sm italic text-muted">
+              {review.what_they_got}
+            </span>
+          )}
+          <span className="text-xs text-muted">{timeAgo(review.created_at)}</span>
+        </div>
       </div>
       {canEdit && (
         <div className="flex gap-2 shrink-0">

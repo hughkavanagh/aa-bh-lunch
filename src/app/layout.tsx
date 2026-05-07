@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Cult Lunch",
-  description: "Lunch spots and cafes near 148 Mercer St",
+  description: "Ooo! What'd you get?",
 };
 
 export default function RootLayout({
