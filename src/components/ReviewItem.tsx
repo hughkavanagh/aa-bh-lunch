@@ -20,12 +20,12 @@ export default function ReviewItem({
     <div className="flex items-start justify-between py-3 border-t border-border/60">
       <div className="flex gap-3">
         {review.image_url && (
-          <div className="w-14 h-14 shrink-0 rounded-md overflow-hidden bg-border/20">
+          <div className="w-12 h-12 shrink-0">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={review.image_url}
               alt="Food photo"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain drop-shadow-sm"
             />
           </div>
         )}

@@ -14,6 +14,7 @@ import AddModal from "@/components/AddModal";
 import EditModal from "@/components/EditModal";
 import AdminModal from "@/components/AdminModal";
 import BatchImportModal from "@/components/BatchImportModal";
+import FoodRain from "@/components/FoodRain";
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -31,6 +32,7 @@ function HomeContent() {
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [showBatchImport, setShowBatchImport] = useState(false);
+  const [foodRainActive, setFoodRainActive] = useState(false);
 
   const [myReviewIds, setMyReviewIds] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -92,6 +94,13 @@ function HomeContent() {
   const sorted = useMemo(() => {
     return sortPlaces(reviewedPlaces);
   }, [reviewedPlaces, sortPlaces]);
+
+  const foodImageUrls = useMemo(() => {
+    return places
+      .flatMap((p) => p.reviews)
+      .map((r) => r.image_url)
+      .filter((url): url is string => !!url);
+  }, [places]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -211,9 +220,20 @@ function HomeContent() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 w-full">
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <h1 className="text-lg font-medium uppercase tracking-widest">
-          Cult Lunch
-        </h1>
+        <div className="flex items-center gap-3">
+          <h1 className="text-lg font-medium uppercase tracking-widest">
+            Cult Lunch
+          </h1>
+          {foodImageUrls.length > 0 && (
+            <button
+              onClick={() => setFoodRainActive((v) => !v)}
+              className="text-lg leading-none hover:scale-125 transition-transform"
+              title={foodRainActive ? "Clear plates" : "Make it rain"}
+            >
+              🍽️
+            </button>
+          )}
+        </div>
         <button
           onClick={() => setShowAddModal(true)}
           className="px-5 py-2 text-xs font-medium uppercase tracking-widest bg-fg text-bg rounded-md hover:opacity-90 self-start sm:self-auto"
@@ -402,6 +422,12 @@ function HomeContent() {
           category={tab}
         />
       )}
+
+      <FoodRain
+        imageUrls={foodImageUrls}
+        active={foodRainActive}
+        onDone={() => setFoodRainActive(false)}
+      />
     </div>
   );
 }
