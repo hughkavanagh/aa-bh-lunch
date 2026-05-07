@@ -120,7 +120,10 @@ export default function FoodRain({
       imagesRef.current = imgMap;
 
       const size = Math.min(w, h) * 0.117;
-      const radius = size / 2;
+      const visualRadius = size / 2;
+      // Collision radius is smaller than the visual — the plate
+      // sits inside the square PNG with transparent padding around it
+      const collisionRadius = visualRadius * 0.72;
 
       // Stagger spawning
       urls.forEach((_, i) => {
@@ -129,7 +132,7 @@ export default function FoodRain({
           const x = Math.random() * (w - size * 2) + size;
           const y = -size - Math.random() * 400;
 
-          const body = Matter.Bodies.circle(x, y, radius, {
+          const body = Matter.Bodies.circle(x, y, collisionRadius, {
             restitution: 0.4,
             friction: 0.3,
             density: 0.002,
@@ -155,13 +158,13 @@ export default function FoodRain({
         if (!img) continue;
 
         const { x, y } = body.position;
-        const size = (body as { circleRadius?: number }).circleRadius
-          ? (body as { circleRadius: number }).circleRadius * 2
-          : 60;
+        // Draw at visual size (larger than collision radius)
+        const cr = (body as { circleRadius?: number }).circleRadius ?? 30;
+        const drawSize = (cr / 0.72) * 2;
 
         ctx.save();
         ctx.translate(x, y);
-        ctx.drawImage(img, -size / 2, -size / 2, size, size);
+        ctx.drawImage(img, -drawSize / 2, -drawSize / 2, drawSize, drawSize);
         ctx.restore();
       }
 
