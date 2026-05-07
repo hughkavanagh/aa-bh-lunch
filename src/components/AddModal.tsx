@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import type { ResolvedPlace } from "@/types";
+import type { PlaceWithStats, ResolvedPlace } from "@/types";
 import PasswordPrompt from "./PasswordPrompt";
 
 interface AddModalProps {
@@ -9,6 +9,7 @@ interface AddModalProps {
   onSuccess: (reviewId: string) => void;
   cachedPassword: string | null;
   onPasswordVerified: (password: string) => void;
+  existingPlace?: PlaceWithStats;
 }
 
 export default function AddModal({
@@ -16,17 +17,29 @@ export default function AddModal({
   onSuccess,
   cachedPassword,
   onPasswordVerified,
+  existingPlace,
 }: AddModalProps) {
   const [password, setPassword] = useState(cachedPassword);
   const [passwordError, setPasswordError] = useState<string | null>(null);
   const [passwordLoading, setPasswordLoading] = useState(false);
 
   const [mapsUrl, setMapsUrl] = useState("");
-  const [resolved, setResolved] = useState<ResolvedPlace | null>(null);
+  const [resolved, setResolved] = useState<ResolvedPlace | null>(
+    existingPlace
+      ? {
+          google_place_id: existingPlace.google_place_id,
+          name: existingPlace.name,
+          walk_minutes: existingPlace.walk_minutes,
+          google_maps_url: existingPlace.google_maps_url,
+        }
+      : null
+  );
   const [resolving, setResolving] = useState(false);
   const [resolveError, setResolveError] = useState<string | null>(null);
 
-  const [category, setCategory] = useState<"lunch" | "cafe">("lunch");
+  const [category, setCategory] = useState<"lunch" | "cafe">(
+    existingPlace?.category ?? "lunch"
+  );
   const [reviewerName, setReviewerName] = useState("");
   const [rating, setRating] = useState("");
   const [price, setPrice] = useState("");
@@ -96,6 +109,7 @@ export default function AddModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           password,
+          place_id: existingPlace?.id,
           google_place_id: resolved.google_place_id,
           name: resolved.name,
           category,
@@ -128,6 +142,8 @@ export default function AddModal({
     price &&
     parseFloat(price) > 0;
 
+  const isReviewOnly = !!existingPlace;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-fg/30 backdrop-blur-sm p-4"
@@ -139,7 +155,7 @@ export default function AddModal({
       >
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-sm font-medium uppercase tracking-widest">
-            Add a spot
+            {isReviewOnly ? `Review ${existingPlace.name}` : "Add a spot"}
           </h2>
           <button onClick={onClose} className="text-muted hover:text-fg text-lg">
             ×
@@ -156,57 +172,67 @@ export default function AddModal({
           />
         ) : (
           <div className="flex flex-col gap-4">
-            <div>
-              <label className="text-xs uppercase tracking-widest text-muted font-medium mb-1 block">
-                Google Maps URL
-              </label>
-              <input
-                type="url"
-                value={mapsUrl}
-                onChange={(e) => setMapsUrl(e.target.value)}
-                onBlur={() => resolvePlace(mapsUrl)}
-                onPaste={(e) => {
-                  const pasted = e.clipboardData.getData("text");
-                  setTimeout(() => resolvePlace(pasted), 100);
-                }}
-                placeholder="Paste a Google Maps link"
-                className="w-full border border-border rounded-md px-3 py-2 text-sm bg-surface focus:outline-none focus:border-fg"
-              />
-              {resolving && (
-                <p className="text-xs text-muted mt-1">Resolving...</p>
-              )}
-              {resolveError && (
-                <p className="text-xs text-accent mt-1">{resolveError}</p>
-              )}
-              {resolved && (
-                <div className="mt-2 p-3 bg-border/20 rounded-md">
-                  <p className="text-sm">
-                    Found: <strong>{resolved.name}</strong> — {resolved.walk_minutes} min walk
-                  </p>
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="text-xs uppercase tracking-widest text-muted font-medium mb-2 block">
-                Category
-              </label>
-              <div className="flex gap-3">
-                {(["lunch", "cafe"] as const).map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setCategory(cat)}
-                    className={`px-4 py-1.5 text-xs uppercase tracking-wider rounded-md border ${
-                      category === cat
-                        ? "bg-fg text-bg border-fg"
-                        : "border-border text-muted hover:text-fg"
-                    }`}
-                  >
-                    {cat === "cafe" ? "Cafe" : "Lunch"}
-                  </button>
-                ))}
+            {isReviewOnly ? (
+              <div className="p-3 bg-border/20 rounded-md">
+                <p className="text-sm">
+                  <strong>{existingPlace.name}</strong> — {existingPlace.walk_minutes} min walk
+                </p>
               </div>
-            </div>
+            ) : (
+              <>
+                <div>
+                  <label className="text-xs uppercase tracking-widest text-muted font-medium mb-1 block">
+                    Google Maps URL
+                  </label>
+                  <input
+                    type="url"
+                    value={mapsUrl}
+                    onChange={(e) => setMapsUrl(e.target.value)}
+                    onBlur={() => resolvePlace(mapsUrl)}
+                    onPaste={(e) => {
+                      const pasted = e.clipboardData.getData("text");
+                      setTimeout(() => resolvePlace(pasted), 100);
+                    }}
+                    placeholder="Paste a Google Maps link"
+                    className="w-full border border-border rounded-md px-3 py-2 text-sm bg-surface focus:outline-none focus:border-fg"
+                  />
+                  {resolving && (
+                    <p className="text-xs text-muted mt-1">Resolving...</p>
+                  )}
+                  {resolveError && (
+                    <p className="text-xs text-accent mt-1">{resolveError}</p>
+                  )}
+                  {resolved && (
+                    <div className="mt-2 p-3 bg-border/20 rounded-md">
+                      <p className="text-sm">
+                        Found: <strong>{resolved.name}</strong> — {resolved.walk_minutes} min walk
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="text-xs uppercase tracking-widest text-muted font-medium mb-2 block">
+                    Category
+                  </label>
+                  <div className="flex gap-3">
+                    {(["lunch", "cafe"] as const).map((cat) => (
+                      <button
+                        key={cat}
+                        onClick={() => setCategory(cat)}
+                        className={`px-4 py-1.5 text-xs uppercase tracking-wider rounded-md border ${
+                          category === cat
+                            ? "bg-fg text-bg border-fg"
+                            : "border-border text-muted hover:text-fg"
+                        }`}
+                      >
+                        {cat === "cafe" ? "Cafe" : "Lunch"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
 
             <div>
               <label className="text-xs uppercase tracking-widest text-muted font-medium mb-1 block">
@@ -217,6 +243,7 @@ export default function AddModal({
                 value={reviewerName}
                 onChange={(e) => setReviewerName(e.target.value)}
                 placeholder="e.g. Alex"
+                autoFocus={isReviewOnly}
                 className="w-full border border-border rounded-md px-3 py-2 text-sm bg-surface focus:outline-none focus:border-fg"
               />
             </div>

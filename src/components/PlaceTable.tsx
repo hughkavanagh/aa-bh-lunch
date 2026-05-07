@@ -23,6 +23,8 @@ interface PlaceTableProps {
   isAdmin: boolean;
   onEditReview: (review: Review) => void;
   onDeleteReview: (review: Review) => void;
+  onAddReview: (place: PlaceWithStats) => void;
+  unreviewedPlaces?: PlaceWithStats[];
 }
 
 export default function PlaceTable({
@@ -36,6 +38,8 @@ export default function PlaceTable({
   isAdmin,
   onEditReview,
   onDeleteReview,
+  onAddReview,
+  unreviewedPlaces,
 }: PlaceTableProps) {
   return (
     <div className="overflow-x-auto">
@@ -58,6 +62,7 @@ export default function PlaceTable({
                 )}
               </th>
             ))}
+            <th className="w-20" />
             <th className="w-8" />
           </tr>
         </thead>
@@ -72,9 +77,40 @@ export default function PlaceTable({
               isAdmin={isAdmin}
               onEditReview={onEditReview}
               onDeleteReview={onDeleteReview}
+              onAddReview={() => onAddReview(place)}
             />
           ))}
         </tbody>
+        {unreviewedPlaces && unreviewedPlaces.length > 0 && (
+          <>
+            <tbody>
+              <tr>
+                <td colSpan={8} className="pt-8 pb-4 px-4">
+                  <div className="border-t border-muted/30" />
+                  <p className="text-xs uppercase tracking-widest text-muted font-medium mt-4">
+                    Unreviewed
+                  </p>
+                </td>
+              </tr>
+            </tbody>
+            <tbody>
+              {unreviewedPlaces.map((place) => (
+                <PlaceRow
+                  key={place.id}
+                  place={place}
+                  expanded={false}
+                  onToggle={() => {}}
+                  myReviewIds={myReviewIds}
+                  isAdmin={isAdmin}
+                  onEditReview={onEditReview}
+                  onDeleteReview={onDeleteReview}
+                  onAddReview={() => onAddReview(place)}
+                  unreviewed
+                />
+              ))}
+            </tbody>
+          </>
+        )}
       </table>
     </div>
   );

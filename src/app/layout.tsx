@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AA-BH Lunch",
+  title: "Cult Lunch",
   description: "Lunch spots and cafes near 148 Mercer St",
 };
 

@@ -12,6 +12,8 @@ interface PlaceRowProps {
   isAdmin: boolean;
   onEditReview: (review: Review) => void;
   onDeleteReview: (review: Review) => void;
+  onAddReview: () => void;
+  unreviewed?: boolean;
 }
 
 export default function PlaceRow({
@@ -22,12 +24,14 @@ export default function PlaceRow({
   isAdmin,
   onEditReview,
   onDeleteReview,
+  onAddReview,
+  unreviewed,
 }: PlaceRowProps) {
   return (
     <>
       <tr
-        onClick={onToggle}
-        className="cursor-pointer hover:bg-border/20 transition-colors border-b border-border/60"
+        onClick={unreviewed ? undefined : onToggle}
+        className={`${unreviewed ? "" : "cursor-pointer"} hover:bg-border/20 transition-colors border-b border-border/60`}
       >
         <td className="py-3 px-4">
           <a
@@ -41,33 +45,59 @@ export default function PlaceRow({
           </a>
         </td>
         <td className="py-3 px-4 font-mono text-right">
-          {place.review_count > 0 ? place.avg_rating.toFixed(1) : "—"}
+          {unreviewed ? (
+            <span className="text-muted text-xs tracking-wider">UNREVIEWED</span>
+          ) : (
+            place.review_count > 0 ? place.avg_rating.toFixed(1) : "—"
+          )}
         </td>
         <td className="py-3 px-4 font-mono text-right">
-          {place.review_count > 0 ? formatPrice(place.avg_price) : "—"}
+          {unreviewed ? (
+            <span className="text-muted text-xs tracking-wider">UNREVIEWED</span>
+          ) : (
+            place.review_count > 0 ? formatPrice(place.avg_price) : "—"
+          )}
         </td>
         <td className="py-3 px-4 font-mono text-right">
           {place.walk_minutes} min
         </td>
         <td className="py-3 px-4 font-mono text-right">
-          {place.review_count > 0 ? place.rating_per_dollar.toFixed(1) : "—"}
+          {unreviewed ? (
+            <span className="text-muted text-xs tracking-wider">UNREVIEWED</span>
+          ) : (
+            place.review_count > 0 ? place.rating_per_dollar.toFixed(1) : "—"
+          )}
         </td>
         <td className="py-3 px-4 text-right text-muted text-sm">
           {place.review_count}
         </td>
-        <td className="py-3 px-2 text-muted">
-          <span
-            className={`inline-block transition-transform ${
-              expanded ? "rotate-90" : ""
-            }`}
+        <td className="py-3 px-2">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddReview();
+            }}
+            className="text-xs text-muted hover:text-fg border border-border/60 rounded px-2 py-1 hover:border-fg/30 transition-colors whitespace-nowrap"
           >
-            ›
-          </span>
+            + Review
+          </button>
         </td>
+        {!unreviewed && (
+          <td className="py-3 px-2 text-muted">
+            <span
+              className={`inline-block transition-transform ${
+                expanded ? "rotate-90" : ""
+              }`}
+            >
+              ›
+            </span>
+          </td>
+        )}
+        {unreviewed && <td className="py-3 px-2" />}
       </tr>
-      {expanded && (
+      {expanded && !unreviewed && (
         <tr>
-          <td colSpan={7} className="bg-border/10">
+          <td colSpan={8} className="bg-border/10">
             <ReviewList
               reviews={place.reviews}
               myReviewIds={myReviewIds}

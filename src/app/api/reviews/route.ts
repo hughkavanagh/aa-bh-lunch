@@ -4,13 +4,17 @@ import { createServiceClient } from "@/lib/supabase";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { password, google_place_id, name, category, walk_minutes, google_maps_url, reviewer_name, rating, price, what_they_got } = body;
+    const { password, place_id, google_place_id, name, category, walk_minutes, google_maps_url, reviewer_name, rating, price, what_they_got } = body;
 
     if (password !== process.env.OFFICE_PASSWORD) {
       return NextResponse.json({ error: "Wrong password" }, { status: 401 });
     }
 
-    if (!google_place_id || !name || !category || !reviewer_name || !rating || !price) {
+    if (!reviewer_name || !rating || !price) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    if (!place_id && (!google_place_id || !name || !category)) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
@@ -24,37 +28,41 @@ export async function POST(req: NextRequest) {
 
     const db = createServiceClient();
 
-    const { data: existingPlace } = await db
-      .from("places")
-      .select("id")
-      .eq("google_place_id", google_place_id)
-      .single();
-
     let placeId: string;
 
-    if (existingPlace) {
-      placeId = existingPlace.id;
+    if (place_id) {
+      placeId = place_id;
     } else {
-      const { data: newPlace, error: placeError } = await db
+      const { data: existingPlace } = await db
         .from("places")
-        .insert({
-          google_place_id,
-          name,
-          category,
-          walk_minutes,
-          google_maps_url,
-        })
         .select("id")
+        .eq("google_place_id", google_place_id)
         .single();
 
-      if (placeError || !newPlace) {
-        return NextResponse.json(
-          { error: "Failed to create place" },
-          { status: 500 }
-        );
-      }
+      if (existingPlace) {
+        placeId = existingPlace.id;
+      } else {
+        const { data: newPlace, error: placeError } = await db
+          .from("places")
+          .insert({
+            google_place_id,
+            name,
+            category,
+            walk_minutes,
+            google_maps_url,
+          })
+          .select("id")
+          .single();
 
-      placeId = newPlace.id;
+        if (placeError || !newPlace) {
+          return NextResponse.json(
+            { error: "Failed to create place" },
+            { status: 500 }
+          );
+        }
+
+        placeId = newPlace.id;
+      }
     }
 
     const { data: review, error: reviewError } = await db

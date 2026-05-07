@@ -13,6 +13,7 @@ import SortDropdown from "@/components/SortDropdown";
 import AddModal from "@/components/AddModal";
 import EditModal from "@/components/EditModal";
 import AdminModal from "@/components/AdminModal";
+import BatchImportModal from "@/components/BatchImportModal";
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -26,8 +27,10 @@ function HomeContent() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const [showAddModal, setShowAddModal] = useState(false);
+  const [reviewingPlace, setReviewingPlace] = useState<PlaceWithStats | null>(null);
   const [editingReview, setEditingReview] = useState<Review | null>(null);
   const [showAdminModal, setShowAdminModal] = useState(false);
+  const [showBatchImport, setShowBatchImport] = useState(false);
 
   const [myReviewIds, setMyReviewIds] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -60,14 +63,24 @@ function HomeContent() {
     setExpandedId(null);
   }, [fetchPlaces]);
 
+  const reviewedPlaces = useMemo(
+    () => places.filter((p) => p.review_count > 0),
+    [places]
+  );
+
+  const unreviewedPlaces = useMemo(
+    () => places.filter((p) => p.review_count === 0),
+    [places]
+  );
+
   const sorted = useMemo(() => {
-    return [...places].sort((a, b) => {
+    return [...reviewedPlaces].sort((a, b) => {
       const aVal = a[sortField];
       const bVal = b[sortField];
       const mult = sortDirection === "asc" ? 1 : -1;
       return (Number(aVal) - Number(bVal)) * mult;
     });
-  }, [places, sortField, sortDirection]);
+  }, [reviewedPlaces, sortField, sortDirection]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -87,6 +100,7 @@ function HomeContent() {
     setMyReviewIds(updated);
     localStorage.setItem("my_review_ids", JSON.stringify(updated));
     setShowAddModal(false);
+    setReviewingPlace(null);
     fetchPlaces();
   };
 
@@ -137,12 +151,9 @@ function HomeContent() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 w-full">
       <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-        <div>
-          <h1 className="text-lg font-medium uppercase tracking-widest mb-1">
-            AA-BH Lunch
-          </h1>
-          <p className="text-xs text-muted">148 Mercer St, New York</p>
-        </div>
+        <h1 className="text-lg font-medium uppercase tracking-widest">
+          Cult Lunch
+        </h1>
         <button
           onClick={() => setShowAddModal(true)}
           className="px-5 py-2 text-xs font-medium uppercase tracking-widest bg-fg text-bg rounded-md hover:opacity-90 self-start sm:self-auto"
@@ -156,12 +167,20 @@ function HomeContent() {
           <span className="text-xs text-accent uppercase tracking-widest font-medium">
             Admin mode active
           </span>
-          <button
-            onClick={handleAdminExit}
-            className="text-xs text-accent hover:underline"
-          >
-            Exit
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowBatchImport(true)}
+              className="text-xs text-accent hover:underline"
+            >
+              Batch Import
+            </button>
+            <button
+              onClick={handleAdminExit}
+              className="text-xs text-accent hover:underline"
+            >
+              Exit
+            </button>
+          </div>
         </div>
       )}
 
@@ -181,7 +200,7 @@ function HomeContent() {
 
       {loading ? (
         <div className="py-16 text-center text-muted text-sm">Loading...</div>
-      ) : sorted.length === 0 ? (
+      ) : sorted.length === 0 && unreviewedPlaces.length === 0 ? (
         <div className="py-16 text-center">
           <p className="text-muted text-sm">
             No {tab === "lunch" ? "lunch spots" : "cafes"} yet
@@ -202,6 +221,8 @@ function HomeContent() {
               isAdmin={isAdmin}
               onEditReview={setEditingReview}
               onDeleteReview={handleDeleteReview}
+              onAddReview={(place) => setReviewingPlace(place)}
+              unreviewedPlaces={unreviewedPlaces}
             />
           </div>
           <div className="sm:hidden flex flex-col gap-3">
@@ -217,8 +238,33 @@ function HomeContent() {
                 isAdmin={isAdmin}
                 onEditReview={setEditingReview}
                 onDeleteReview={handleDeleteReview}
+                onAddReview={() => setReviewingPlace(place)}
               />
             ))}
+            {unreviewedPlaces.length > 0 && (
+              <>
+                <div className="mt-6 mb-2">
+                  <div className="border-t border-muted/30" />
+                  <p className="text-xs uppercase tracking-widest text-muted font-medium mt-3">
+                    Unreviewed
+                  </p>
+                </div>
+                {unreviewedPlaces.map((place) => (
+                  <PlaceCard
+                    key={place.id}
+                    place={place}
+                    expanded={false}
+                    onToggle={() => {}}
+                    myReviewIds={myReviewIds}
+                    isAdmin={isAdmin}
+                    onEditReview={setEditingReview}
+                    onDeleteReview={handleDeleteReview}
+                    onAddReview={() => setReviewingPlace(place)}
+                    unreviewed
+                  />
+                ))}
+              </>
+            )}
           </div>
         </>
       )}
@@ -244,6 +290,19 @@ function HomeContent() {
         />
       )}
 
+      {reviewingPlace && (
+        <AddModal
+          onClose={() => setReviewingPlace(null)}
+          onSuccess={handleAddSuccess}
+          cachedPassword={officePassword}
+          onPasswordVerified={(pw) => {
+            setOfficePassword(pw);
+            sessionStorage.setItem("office_password", pw);
+          }}
+          existingPlace={reviewingPlace}
+        />
+      )}
+
       {editingReview && editPassword && (
         <EditModal
           review={editingReview}
@@ -261,6 +320,15 @@ function HomeContent() {
         <AdminModal
           onClose={() => setShowAdminModal(false)}
           onSuccess={handleAdminUnlock}
+        />
+      )}
+
+      {showBatchImport && adminPassword && (
+        <BatchImportModal
+          onClose={() => setShowBatchImport(false)}
+          onSuccess={fetchPlaces}
+          adminPassword={adminPassword}
+          category={tab}
         />
       )}
     </div>
