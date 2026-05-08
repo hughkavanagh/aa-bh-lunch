@@ -134,6 +134,57 @@ export default function AddModal({
     });
   };
 
+  // Trim transparent margins so the stored PNG is tightly cropped to the plate
+  const trimTransparentPixels = (blob: Blob): Promise<Blob> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        try {
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d")!;
+          ctx.drawImage(img, 0, 0);
+
+          const { width, height } = canvas;
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const { data } = imageData;
+
+          let top = height, bottom = 0, left = width, right = 0;
+          for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+              if (data[(y * width + x) * 4 + 3] > 10) {
+                if (y < top) top = y;
+                if (y > bottom) bottom = y;
+                if (x < left) left = x;
+                if (x > right) right = x;
+              }
+            }
+          }
+
+          if (top >= bottom || left >= right) {
+            resolve(blob);
+            return;
+          }
+
+          const trimW = right - left + 1;
+          const trimH = bottom - top + 1;
+          const trimmed = document.createElement("canvas");
+          trimmed.width = trimW;
+          trimmed.height = trimH;
+          trimmed
+            .getContext("2d")!
+            .drawImage(canvas, left, top, trimW, trimH, 0, 0, trimW, trimH);
+          trimmed.toBlob((b) => resolve(b!), "image/png");
+        } catch {
+          resolve(blob);
+        }
+      };
+      img.onerror = () => resolve(blob);
+      img.src = URL.createObjectURL(blob);
+    });
+  };
+
   const handlePhotoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -171,8 +222,11 @@ export default function AddModal({
         },
       });
 
-      setProcessedBlob(result);
-      setProcessedPreview(URL.createObjectURL(result));
+      setPhotoProgress("Trimming...");
+      const trimmed = await trimTransparentPixels(result);
+
+      setProcessedBlob(trimmed);
+      setProcessedPreview(URL.createObjectURL(trimmed));
       setPhotoProgress("");
     } catch (err) {
       console.error("Background removal failed:", err);

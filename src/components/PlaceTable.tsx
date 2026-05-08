@@ -56,9 +56,9 @@ export default function PlaceTable({
           <col />
           <col />
           <col />
-          <col style={{ width: "5%" }} />
+          <col />
           <col style={{ width: "80px" }} />
-          <col style={{ width: "32px" }} />
+          <col style={{ width: "48px" }} />
         </colgroup>
         <thead>
           <tr className="border-b-2 border-border">

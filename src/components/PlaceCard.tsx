@@ -46,7 +46,7 @@ export default function PlaceCard({
           >
             {place.name}
           </a>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <button
               onClick={onAddReview}
               className="text-xs text-muted hover:text-fg border border-border/60 rounded px-2 py-1 hover:border-fg/30 transition-colors whitespace-nowrap"
@@ -54,7 +54,7 @@ export default function PlaceCard({
               + Review
             </button>
             {canExpand && (
-              <button onClick={onToggle} className="p-1">
+              <button onClick={onToggle} className="p-2 -mr-2">
                 <span
                   className={`text-muted transition-transform inline-block ${
                     expanded ? "rotate-90" : ""

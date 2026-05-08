@@ -23,7 +23,7 @@ function HomeContent() {
   const tab = (searchParams.get("tab") === "cafe" ? "cafe" : "lunch") as "lunch" | "cafe";
   const [places, setPlaces] = useState<PlaceWithStats[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sortField, setSortField] = useState<SortField>("avg_rating");
+  const [sortField, setSortField] = useState<SortField>("rating_per_dollar");
   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
   const [expandedId, setExpandedId] = useState<string | null>(null);
 

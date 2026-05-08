@@ -3,6 +3,54 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import Matter from "matter-js";
 
+// Trim transparent margins from a loaded image, returning a tightly-cropped canvas
+function trimTransparentMargins(
+  source: HTMLImageElement
+): HTMLCanvasElement | HTMLImageElement {
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = source.naturalWidth;
+    canvas.height = source.naturalHeight;
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(source, 0, 0);
+
+    const { width, height } = canvas;
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const { data } = imageData;
+
+    let top = height,
+      bottom = 0,
+      left = width,
+      right = 0;
+
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        if (data[(y * width + x) * 4 + 3] > 10) {
+          if (y < top) top = y;
+          if (y > bottom) bottom = y;
+          if (x < left) left = x;
+          if (x > right) right = x;
+        }
+      }
+    }
+
+    if (top >= bottom || left >= right) return source;
+
+    const trimW = right - left + 1;
+    const trimH = bottom - top + 1;
+    const trimmed = document.createElement("canvas");
+    trimmed.width = trimW;
+    trimmed.height = trimH;
+    trimmed
+      .getContext("2d")!
+      .drawImage(canvas, left, top, trimW, trimH, 0, 0, trimW, trimH);
+    return trimmed;
+  } catch {
+    // CORS or other error — return original untrimmed
+    return source;
+  }
+}
+
 interface FoodRainProps {
   imageUrls: string[];
   active: boolean;
@@ -22,7 +70,7 @@ export default function FoodRain({
   const [dropping, setDropping] = useState(false);
   const bodiesRef = useRef<Matter.Body[]>([]);
   const wallsRef = useRef<{ floor: Matter.Body; left: Matter.Body; right: Matter.Body } | null>(null);
-  const imagesRef = useRef<Map<number, HTMLImageElement>>(new Map());
+  const imagesRef = useRef<Map<number, HTMLImageElement | HTMLCanvasElement>>(new Map());
   const animFrameRef = useRef<number>(0);
 
   const cleanup = useCallback(() => {
@@ -51,17 +99,17 @@ export default function FoodRain({
     return urls;
   }, [imageUrls, count]);
 
-  // Preload images
+  // Preload images and trim transparent margins
   const preloadImages = useCallback(
-    (urls: string[]): Promise<Map<number, HTMLImageElement>> => {
-      const map = new Map<number, HTMLImageElement>();
+    (urls: string[]): Promise<Map<number, HTMLImageElement | HTMLCanvasElement>> => {
+      const map = new Map<number, HTMLImageElement | HTMLCanvasElement>();
       const promises = urls.map(
         (url, i) =>
           new Promise<void>((resolve) => {
             const img = new Image();
             img.crossOrigin = "anonymous";
             img.onload = () => {
-              map.set(i, img);
+              map.set(i, trimTransparentMargins(img));
               resolve();
             };
             img.onerror = () => resolve();
@@ -119,7 +167,7 @@ export default function FoodRain({
     preloadImages(urls).then((imgMap) => {
       imagesRef.current = imgMap;
 
-      const size = Math.min(w, h) * 0.117;
+      const size = Math.min(w, h) * 0.22;
       const visualRadius = size / 2;
       // Collision radius is smaller than the visual — the plate
       // sits inside the square PNG with transparent padding around it
@@ -162,9 +210,22 @@ export default function FoodRain({
         const cr = (body as { circleRadius?: number }).circleRadius ?? 30;
         const drawSize = (cr / 0.72) * 2;
 
+        // Preserve aspect ratio of (now trimmed) image
+        const imgW = img instanceof HTMLCanvasElement ? img.width : img.naturalWidth;
+        const imgH = img instanceof HTMLCanvasElement ? img.height : img.naturalHeight;
+        const aspect = imgW / imgH || 1;
+        let dw: number, dh: number;
+        if (aspect >= 1) {
+          dw = drawSize;
+          dh = drawSize / aspect;
+        } else {
+          dh = drawSize;
+          dw = drawSize * aspect;
+        }
+
         ctx.save();
         ctx.translate(x, y);
-        ctx.drawImage(img, -drawSize / 2, -drawSize / 2, drawSize, drawSize);
+        ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh);
         ctx.restore();
       }
 

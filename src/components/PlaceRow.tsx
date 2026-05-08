@@ -75,10 +75,10 @@ export default function PlaceRow({
             place.review_count > 0 ? place.rating_per_dollar.toFixed(1) : "—"
           )}
         </td>
-        <td className="py-3 px-5 text-muted text-sm">
+        <td className="py-3 pl-5 pr-1 text-muted text-sm">
           {place.review_count}
         </td>
-        <td className="py-3 px-2">
+        <td className="py-3 pl-1 pr-2">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -90,7 +90,7 @@ export default function PlaceRow({
           </button>
         </td>
         {canExpand ? (
-          <td className="py-3 px-2 text-muted">
+          <td className="py-3 pl-4 pr-2 text-muted">
             <span
               className={`inline-block transition-transform ${
                 expanded ? "rotate-90" : ""
