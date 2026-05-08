@@ -169,9 +169,8 @@ export default function FoodRain({
 
       const size = Math.min(w, h) * 0.22;
       const visualRadius = size / 2;
-      // Collision radius is smaller than the visual — the plate
-      // sits inside the square PNG with transparent padding around it
-      const collisionRadius = visualRadius * 0.72;
+      // Collision radius slightly smaller than visual for natural touching
+      const collisionRadius = visualRadius * 0.92;
 
       // Stagger spawning
       urls.forEach((_, i) => {
@@ -208,7 +207,7 @@ export default function FoodRain({
         const { x, y } = body.position;
         // Draw at visual size (larger than collision radius)
         const cr = (body as { circleRadius?: number }).circleRadius ?? 30;
-        const drawSize = (cr / 0.72) * 2;
+        const drawSize = (cr / 0.92) * 2;
 
         // Preserve aspect ratio of (now trimmed) image
         const imgW = img instanceof HTMLCanvasElement ? img.width : img.naturalWidth;
