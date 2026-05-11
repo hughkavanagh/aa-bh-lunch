@@ -272,8 +272,10 @@ export default function FoodRain({
   // Drop the floor when deactivated
   useEffect(() => {
     if (!active && dropping && wallsRef.current && engineRef.current) {
-      // Remove the floor so everything falls out
+      // Remove floor and side walls so everything falls out cleanly
       Matter.Composite.remove(engineRef.current.world, wallsRef.current.floor);
+      Matter.Composite.remove(engineRef.current.world, wallsRef.current.left);
+      Matter.Composite.remove(engineRef.current.world, wallsRef.current.right);
 
       setTimeout(() => {
         cleanup();
