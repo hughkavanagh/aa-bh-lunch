@@ -34,6 +34,7 @@ function HomeContent() {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [showBatchImport, setShowBatchImport] = useState(false);
   const [foodRainActive, setFoodRainActive] = useState(false);
+  const [foodRainLocked, setFoodRainLocked] = useState(false);
   const [highlightedPlaceId, setHighlightedPlaceId] = useState<string | null>(null);
 
   const [myReviewIds, setMyReviewIds] = useState<string[]>([]);
@@ -240,7 +241,16 @@ function HomeContent() {
           </h1>
           {foodImageUrls.length > 0 && (
             <button
-              onClick={() => setFoodRainActive((v) => !v)}
+              onClick={() => {
+                if (foodRainLocked) return;
+                setFoodRainActive((v) => {
+                  if (!v) {
+                    setFoodRainLocked(true);
+                    setTimeout(() => setFoodRainLocked(false), 4000);
+                  }
+                  return !v;
+                });
+              }}
               className="group relative h-8 flex items-center rounded-full bg-border/20 border border-border/40 transition-all duration-300 ease-in-out w-8 hover:w-[140px] hover:bg-border/30 overflow-hidden"
               title={foodRainActive ? "Clear plates" : "Make it rain"}
             >

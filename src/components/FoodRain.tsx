@@ -275,12 +275,11 @@ export default function FoodRain({
       // Remove the floor so everything falls out
       Matter.Composite.remove(engineRef.current.world, wallsRef.current.floor);
 
-      // Wait for bodies to fall off screen, then clean up
       setTimeout(() => {
         cleanup();
         setDropping(false);
         onDone();
-      }, 2000);
+      }, 5000);
     }
   }, [active, dropping, cleanup, onDone]);
 
