@@ -253,8 +253,8 @@ function HomeContent() {
               }}
               className={`group relative h-8 flex items-center rounded-full bg-border/20 border border-border/40 transition-all duration-300 ease-in-out overflow-hidden ${
                 foodRainActive
-                  ? "z-50 w-[160px] sm:w-8 sm:hover:w-[150px]"
-                  : "w-8 hover:w-[140px]"
+                  ? "z-50 w-auto sm:w-8 sm:hover:w-auto"
+                  : "w-8 hover:w-auto"
               } hover:bg-border/30`}
               title={foodRainActive ? "Clear plates" : "Make it rain"}
             >
