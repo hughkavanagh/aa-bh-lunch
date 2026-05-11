@@ -51,9 +51,9 @@ export default function PlaceTable({
 }: PlaceTableProps) {
   return (
     <div className="overflow-x-auto">
-      <table className="w-full">
+      <table className="w-full" style={{ minWidth: "800px" }}>
         <colgroup>
-          <col style={{ width: "60%" }} />
+          <col style={{ width: "35%" }} />
           <col />
           <col />
           <col />
