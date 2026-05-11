@@ -285,8 +285,9 @@ function HomeContent() {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
         <Tabs active={tab} onChange={handleTabChange} />
+        <RandomPicker places={places} onSelect={handleRandomSelect} />
         <div className="sm:hidden">
           <SortDropdown
             field={sortField}
@@ -298,8 +299,6 @@ function HomeContent() {
           />
         </div>
       </div>
-
-      <RandomPicker places={places} onSelect={handleRandomSelect} />
 
       {loading ? (
         <div className="py-16 text-center text-muted text-sm">Loading...</div>

@@ -54,7 +54,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
     setSpinOffset(0);
     setSpinBlur(8);
 
-    const itemHeight = 48;
+    const itemHeight = 32;
     const totalDistance = winIdx * itemHeight;
     const duration = 2200;
     spinStartRef.current = performance.now();
@@ -107,13 +107,13 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
   if (places.length === 0) return null;
 
   return (
-    <div className="bg-border/20 rounded-xl p-4 mb-6 overflow-hidden">
-      <div className="flex items-center gap-3">
+    <div className="bg-border/20 rounded-lg px-3 py-1 overflow-hidden flex-1">
+      <div className="flex items-center gap-3 h-full">
         {/* Back button — result/spinning state */}
         {(state === "result" || state === "spinning") && (
           <button
             onClick={handleBack}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-border/30 text-muted hover:text-fg transition-colors shrink-0"
+            className="w-6 h-6 flex items-center justify-center rounded-full bg-border/30 text-muted hover:text-fg transition-colors shrink-0"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 19l-7-7 7-7" />
@@ -130,7 +130,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
               </span>
               <div className="flex flex-col items-center">
                 <button
-                  onClick={() => setMaxWalk((v) => Math.min(v + 5, 60))}
+                  onClick={() => setMaxWalk((v) => Math.min(v + 1, 60))}
                   className={`text-[10px] leading-none transition-colors ${
                     filterByWalk
                       ? "text-fg/70 hover:text-fg"
@@ -148,7 +148,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
                   {maxWalk}
                 </span>
                 <button
-                  onClick={() => setMaxWalk((v) => Math.max(v - 5, 5))}
+                  onClick={() => setMaxWalk((v) => Math.max(v - 1, 1))}
                   className={`text-[10px] leading-none transition-colors ${
                     filterByWalk
                       ? "text-fg/70 hover:text-fg"
@@ -199,20 +199,20 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
           <div className="flex-1 flex items-center justify-center min-w-0">
             {state === "spinning" ? (
               <div
-                className="h-12 overflow-hidden relative w-full"
+                className="h-8 overflow-hidden relative w-full"
                 style={{ perspective: "300px" }}
               >
                 <div
                   className="absolute left-0 right-0"
                   style={{
-                    transform: `translateY(${-spinOffset + 24}px)`,
+                    transform: `translateY(${-spinOffset + 12}px)`,
                     filter: spinBlur > 0.5 ? `blur(${spinBlur}px)` : "none",
                   }}
                 >
                   {spinNames.map((name, i) => (
                     <div
                       key={i}
-                      className="h-12 flex items-center justify-center text-lg font-semibold text-fg"
+                      className="h-8 flex items-center justify-center text-sm font-medium text-fg"
                     >
                       {name}
                     </div>
@@ -222,7 +222,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
             ) : (
               <button
                 onClick={handleResultClick}
-                className="text-lg font-semibold text-fg hover:underline transition-colors cursor-pointer"
+                className="text-sm font-medium text-fg hover:underline transition-colors cursor-pointer"
               >
                 {pickedPlace?.name}
               </button>
@@ -237,7 +237,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
         <button
           onClick={state === "idle" || state === "result" ? handleSpin : undefined}
           disabled={eligible.length === 0 || state === "spinning"}
-          className="px-5 py-2.5 text-xs font-medium uppercase tracking-widest bg-fg text-bg rounded-md hover:opacity-90 disabled:opacity-40 transition-opacity shrink-0"
+          className="px-4 py-1.5 text-xs font-medium uppercase tracking-widest bg-fg text-bg rounded-md hover:opacity-90 disabled:opacity-40 transition-opacity shrink-0"
         >
           {state === "idle" ? "Choose for me" : "Spin again"}
         </button>
