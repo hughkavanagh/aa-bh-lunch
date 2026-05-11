@@ -114,8 +114,6 @@ function HomeContent() {
   };
 
   const handleRandomSelect = useCallback((placeId: string) => {
-    // Expand the place, scroll to it, and highlight it
-    setExpandedId(placeId);
     setHighlightedPlaceId(placeId);
     setTimeout(() => {
       const el = document.querySelector(`[data-place-id="${placeId}"]`);

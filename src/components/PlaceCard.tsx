@@ -40,7 +40,7 @@ export default function PlaceCard({
     <div
       data-place-id={place.id}
       className={`border border-border/60 rounded-lg bg-surface overflow-hidden ${
-        highlighted ? "ring-2 ring-accent/40 animate-pulse" : ""
+        highlighted ? "ring-2 ring-border animate-pulse" : ""
       }`}
     >
       <div className="w-full text-left p-4">

@@ -42,7 +42,7 @@ export default function PlaceRow({
         data-place-id={place.id}
         onClick={canExpand ? onToggle : undefined}
         className={`${canExpand ? "cursor-pointer" : ""} hover:bg-border/20 transition-colors border-b border-border/60 ${
-          highlighted ? "bg-accent/10 animate-pulse" : ""
+          highlighted ? "bg-border/30 animate-pulse" : ""
         }`}
       >
         <td className="py-3 px-5">
