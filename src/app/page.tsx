@@ -234,7 +234,7 @@ function HomeContent() {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 w-full">
-      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+      <header className="flex items-center justify-between gap-4 mb-8">
         <div className="flex items-center gap-3">
           <h1 className="text-lg font-medium uppercase tracking-widest">
             Cult Lunch
@@ -251,10 +251,10 @@ function HomeContent() {
                   return !v;
                 });
               }}
-              className={`group relative h-8 flex items-center rounded-full bg-border/20 border border-border/40 transition-all duration-300 ease-in-out overflow-hidden ${
+              className={`group relative h-8 flex items-center rounded-full border border-border/40 transition-all duration-300 ease-in-out overflow-hidden ${
                 foodRainActive
-                  ? "z-50 w-auto sm:w-8 sm:hover:w-auto"
-                  : "w-8 hover:w-auto"
+                  ? "z-50 w-auto sm:w-8 sm:hover:w-auto bg-bg/80 backdrop-blur-md"
+                  : "w-8 hover:w-auto bg-border/20"
               } hover:bg-border/30`}
               title={foodRainActive ? "Clear plates" : "Make it rain"}
             >
@@ -273,7 +273,7 @@ function HomeContent() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="px-5 py-2 text-xs font-medium uppercase tracking-widest bg-fg text-bg rounded-md hover:opacity-90 self-start sm:self-auto"
+          className="px-5 py-2 text-xs font-medium uppercase tracking-widest bg-fg text-bg rounded-md hover:opacity-90"
         >
           + Add
         </button>
