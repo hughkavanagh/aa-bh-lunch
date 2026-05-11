@@ -167,7 +167,7 @@ export default function FoodRain({
     preloadImages(urls).then((imgMap) => {
       imagesRef.current = imgMap;
 
-      const size = Math.min(w, h) * 0.22;
+      const size = Math.min(w, h) * 0.16;
       const visualRadius = size / 2;
       // Collision radius slightly smaller than visual for natural touching
       const collisionRadius = visualRadius * 0.92;

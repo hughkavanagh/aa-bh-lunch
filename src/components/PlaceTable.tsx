@@ -51,7 +51,7 @@ export default function PlaceTable({
     <div className="overflow-x-auto">
       <table className="w-full">
         <colgroup>
-          <col style={{ width: "30%" }} />
+          <col style={{ width: "40%" }} />
           <col />
           <col />
           <col />
