@@ -18,6 +18,7 @@ interface PlaceTableProps {
   sortDirection: SortDirection;
   onSort: (field: SortField) => void;
   expandedId: string | null;
+  highlightedId?: string | null;
   onToggle: (id: string) => void;
   myReviewIds: string[];
   isAdmin: boolean;
@@ -36,6 +37,7 @@ export default function PlaceTable({
   sortDirection,
   onSort,
   expandedId,
+  highlightedId,
   onToggle,
   myReviewIds,
   isAdmin,
@@ -92,6 +94,7 @@ export default function PlaceTable({
               key={place.id}
               place={place}
               expanded={expandedId === place.id}
+              highlighted={highlightedId === place.id}
               onToggle={() => onToggle(place.id)}
               myReviewIds={myReviewIds}
               isAdmin={isAdmin}
@@ -122,6 +125,7 @@ export default function PlaceTable({
                   key={place.id}
                   place={place}
                   expanded={expandedId === place.id}
+                  highlighted={highlightedId === place.id}
                   onToggle={() => onToggle(place.id)}
                   myReviewIds={myReviewIds}
                   isAdmin={isAdmin}

@@ -17,6 +17,7 @@ interface PlaceCardProps {
   onMovePlace: () => void;
   onRenamePlace: () => void;
   unreviewed?: boolean;
+  highlighted?: boolean;
 }
 
 export default function PlaceCard({
@@ -32,10 +33,16 @@ export default function PlaceCard({
   onMovePlace,
   onRenamePlace,
   unreviewed,
+  highlighted,
 }: PlaceCardProps) {
   const canExpand = !unreviewed || isAdmin;
   return (
-    <div className="border border-border/60 rounded-lg bg-surface overflow-hidden">
+    <div
+      data-place-id={place.id}
+      className={`border border-border/60 rounded-lg bg-surface overflow-hidden ${
+        highlighted ? "ring-2 ring-accent/40 animate-pulse" : ""
+      }`}
+    >
       <div className="w-full text-left p-4">
         <div className="flex items-start justify-between mb-2">
           <a

@@ -15,6 +15,7 @@ import EditModal from "@/components/EditModal";
 import AdminModal from "@/components/AdminModal";
 import BatchImportModal from "@/components/BatchImportModal";
 import FoodRain from "@/components/FoodRain";
+import RandomPicker from "@/components/RandomPicker";
 
 function HomeContent() {
   const searchParams = useSearchParams();
@@ -33,6 +34,7 @@ function HomeContent() {
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [showBatchImport, setShowBatchImport] = useState(false);
   const [foodRainActive, setFoodRainActive] = useState(false);
+  const [highlightedPlaceId, setHighlightedPlaceId] = useState<string | null>(null);
 
   const [myReviewIds, setMyReviewIds] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -110,6 +112,20 @@ function HomeContent() {
       setSortDirection(field === "name" || field === "walk_minutes" ? "asc" : "desc");
     }
   };
+
+  const handleRandomSelect = useCallback((placeId: string) => {
+    // Expand the place, scroll to it, and highlight it
+    setExpandedId(placeId);
+    setHighlightedPlaceId(placeId);
+    setTimeout(() => {
+      const el = document.querySelector(`[data-place-id="${placeId}"]`);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 100);
+    // Clear highlight after 2 seconds
+    setTimeout(() => setHighlightedPlaceId(null), 2500);
+  }, []);
 
   const handleTabChange = (newTab: "lunch" | "cafe") => {
     router.push(`/?tab=${newTab}`, { scroll: false });
@@ -283,6 +299,8 @@ function HomeContent() {
         </div>
       </div>
 
+      <RandomPicker places={places} onSelect={handleRandomSelect} />
+
       {loading ? (
         <div className="py-16 text-center text-muted text-sm">Loading...</div>
       ) : sorted.length === 0 && unreviewedPlaces.length === 0 ? (
@@ -301,6 +319,7 @@ function HomeContent() {
               sortDirection={sortDirection}
               onSort={handleSort}
               expandedId={expandedId}
+              highlightedId={highlightedPlaceId}
               onToggle={(id) => setExpandedId(expandedId === id ? null : id)}
               myReviewIds={myReviewIds}
               isAdmin={isAdmin}
@@ -319,6 +338,7 @@ function HomeContent() {
                 key={place.id}
                 place={place}
                 expanded={expandedId === place.id}
+                highlighted={highlightedPlaceId === place.id}
                 onToggle={() =>
                   setExpandedId(expandedId === place.id ? null : place.id)
                 }
@@ -345,6 +365,7 @@ function HomeContent() {
                     key={place.id}
                     place={place}
                     expanded={expandedId === place.id}
+                    highlighted={highlightedPlaceId === place.id}
                     onToggle={() =>
                       setExpandedId(expandedId === place.id ? null : place.id)
                     }

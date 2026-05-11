@@ -17,6 +17,7 @@ interface PlaceRowProps {
   onMovePlace: () => void;
   onRenamePlace: () => void;
   unreviewed?: boolean;
+  highlighted?: boolean;
 }
 
 export default function PlaceRow({
@@ -32,13 +33,17 @@ export default function PlaceRow({
   onMovePlace,
   onRenamePlace,
   unreviewed,
+  highlighted,
 }: PlaceRowProps) {
   const canExpand = !unreviewed || isAdmin;
   return (
     <>
       <tr
+        data-place-id={place.id}
         onClick={canExpand ? onToggle : undefined}
-        className={`${canExpand ? "cursor-pointer" : ""} hover:bg-border/20 transition-colors border-b border-border/60`}
+        className={`${canExpand ? "cursor-pointer" : ""} hover:bg-border/20 transition-colors border-b border-border/60 ${
+          highlighted ? "bg-accent/10 animate-pulse" : ""
+        }`}
       >
         <td className="py-3 px-5">
           <a
