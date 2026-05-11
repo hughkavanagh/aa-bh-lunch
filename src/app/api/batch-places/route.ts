@@ -118,7 +118,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No URLs provided" }, { status: 400 });
     }
 
-    if (!category || (category !== "lunch" && category !== "cafe")) {
+    if (!category || !["lunch", "cafe", "sweets"].includes(category)) {
       return NextResponse.json({ error: "Invalid category" }, { status: 400 });
     }
 

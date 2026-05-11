@@ -13,7 +13,7 @@ interface BatchImportModalProps {
   onClose: () => void;
   onSuccess: () => void;
   adminPassword: string;
-  category: "lunch" | "cafe";
+  category: "lunch" | "cafe" | "sweets";
 }
 
 export default function BatchImportModal({

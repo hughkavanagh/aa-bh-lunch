@@ -2,7 +2,7 @@ export interface Place {
   id: string;
   google_place_id: string;
   name: string;
-  category: "lunch" | "cafe";
+  category: "lunch" | "cafe" | "sweets";
   walk_minutes: number;
   google_maps_url: string;
   created_at: string;

@@ -13,7 +13,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Missing place ID" }, { status: 400 });
     }
 
-    if (category !== undefined && category !== "lunch" && category !== "cafe") {
+    if (category !== undefined && !["lunch", "cafe", "sweets"].includes(category)) {
       return NextResponse.json(
         { error: "Invalid category" },
         { status: 400 }

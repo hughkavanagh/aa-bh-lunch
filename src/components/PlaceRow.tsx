@@ -14,7 +14,7 @@ interface PlaceRowProps {
   onDeleteReview: (review: Review) => void;
   onAddReview: () => void;
   onDeletePlace: () => void;
-  onMovePlace: () => void;
+  onMovePlace: (target: string) => void;
   onRenamePlace: () => void;
   unreviewed?: boolean;
   highlighted?: boolean;
@@ -134,15 +134,20 @@ export default function PlaceRow({
                 >
                   Rename
                 </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onMovePlace();
-                  }}
-                  className="text-xs text-muted hover:text-fg border border-border/60 rounded px-2 py-1 hover:border-fg/30 transition-colors"
-                >
-                  Move to {place.category === "lunch" ? "Cafe" : "Lunch"}
-                </button>
+                {(["lunch", "cafe", "sweets"] as const)
+                  .filter((c) => c !== place.category)
+                  .map((c) => (
+                    <button
+                      key={c}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onMovePlace(c);
+                      }}
+                      className="text-xs text-muted hover:text-fg border border-border/60 rounded px-2 py-1 hover:border-fg/30 transition-colors"
+                    >
+                      Move to {c === "lunch" ? "Lunch" : c === "cafe" ? "Cafés" : "Sweets"}
+                    </button>
+                  ))}
                 <button
                   onClick={(e) => {
                     e.stopPropagation();

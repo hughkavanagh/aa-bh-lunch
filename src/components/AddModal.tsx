@@ -37,7 +37,7 @@ export default function AddModal({
   const [resolving, setResolving] = useState(false);
   const [resolveError, setResolveError] = useState<string | null>(null);
 
-  const [category, setCategory] = useState<"lunch" | "cafe">(
+  const [category, setCategory] = useState<"lunch" | "cafe" | "sweets">(
     existingPlace?.category ?? "lunch"
   );
   const [reviewerName, setReviewerName] = useState("");
@@ -382,7 +382,7 @@ export default function AddModal({
                     Category
                   </label>
                   <div className="flex gap-3">
-                    {(["lunch", "cafe"] as const).map((cat) => (
+                    {(["lunch", "cafe", "sweets"] as const).map((cat) => (
                       <button
                         key={cat}
                         onClick={() => setCategory(cat)}
@@ -392,7 +392,7 @@ export default function AddModal({
                             : "border-border text-muted hover:text-fg"
                         }`}
                       >
-                        {cat === "cafe" ? "Cafe" : "Lunch"}
+                        {cat === "lunch" ? "Lunch" : cat === "cafe" ? "Cafés" : "Sweets"}
                       </button>
                     ))}
                   </div>

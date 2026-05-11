@@ -21,7 +21,8 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const tab = (searchParams.get("tab") === "cafe" ? "cafe" : "lunch") as "lunch" | "cafe";
+  const rawTab = searchParams.get("tab");
+  const tab = (rawTab === "cafe" || rawTab === "sweets" ? rawTab : "lunch") as "lunch" | "cafe" | "sweets";
   const [places, setPlaces] = useState<PlaceWithStats[]>([]);
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState<SortField>("rating_per_dollar");
@@ -45,9 +46,9 @@ function HomeContent() {
   useEffect(() => {
     const stored = localStorage.getItem("my_review_ids");
     if (stored) setMyReviewIds(JSON.parse(stored));
-    setIsAdmin(sessionStorage.getItem("admin_unlocked") === "true");
-    setAdminPassword(sessionStorage.getItem("admin_password"));
-    setOfficePassword(sessionStorage.getItem("office_password"));
+    setIsAdmin(localStorage.getItem("admin_unlocked") === "true");
+    setAdminPassword(localStorage.getItem("admin_password"));
+    setOfficePassword(localStorage.getItem("office_password"));
   }, []);
 
   const fetchPlaces = useCallback(async () => {
@@ -126,7 +127,7 @@ function HomeContent() {
     setTimeout(() => setHighlightedPlaceId(null), 2500);
   }, []);
 
-  const handleTabChange = (newTab: "lunch" | "cafe") => {
+  const handleTabChange = (newTab: "lunch" | "cafe" | "sweets") => {
     router.push(`/?tab=${newTab}`, { scroll: false });
   };
 
@@ -179,8 +180,7 @@ function HomeContent() {
     if (res.ok) fetchPlaces();
   };
 
-  const handleMovePlace = async (place: PlaceWithStats) => {
-    const target = place.category === "lunch" ? "cafe" : "lunch";
+  const handleMovePlace = async (place: PlaceWithStats, target: string) => {
     if (!confirm(`Move "${place.name}" to ${target}?`)) return;
     if (!adminPassword) return;
 
@@ -218,16 +218,16 @@ function HomeContent() {
   const handleAdminUnlock = (pw: string) => {
     setIsAdmin(true);
     setAdminPassword(pw);
-    sessionStorage.setItem("admin_unlocked", "true");
-    sessionStorage.setItem("admin_password", pw);
+    localStorage.setItem("admin_unlocked", "true");
+    localStorage.setItem("admin_password", pw);
     setShowAdminModal(false);
   };
 
   const handleAdminExit = () => {
     setIsAdmin(false);
     setAdminPassword(null);
-    sessionStorage.removeItem("admin_unlocked");
-    sessionStorage.removeItem("admin_password");
+    localStorage.removeItem("admin_unlocked");
+    localStorage.removeItem("admin_password");
   };
 
   const editPassword = isAdmin ? adminPassword : officePassword;
@@ -251,14 +251,22 @@ function HomeContent() {
                   return !v;
                 });
               }}
-              className="group relative h-8 flex items-center rounded-full bg-border/20 border border-border/40 transition-all duration-300 ease-in-out w-8 hover:w-[140px] hover:bg-border/30 overflow-hidden"
+              className={`group relative h-8 flex items-center rounded-full bg-border/20 border border-border/40 transition-all duration-300 ease-in-out overflow-hidden ${
+                foodRainActive
+                  ? "z-50 w-[160px] sm:w-8 sm:hover:w-[150px]"
+                  : "w-8 hover:w-[140px]"
+              } hover:bg-border/30`}
               title={foodRainActive ? "Clear plates" : "Make it rain"}
             >
               <span className="w-8 h-8 flex items-center justify-center shrink-0 text-base leading-none">
                 🌭
               </span>
-              <span className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-widest text-fg/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 pr-1.5">
-                Make it rain
+              <span className={`whitespace-nowrap text-[10px] font-semibold uppercase tracking-widest text-fg/70 transition-opacity duration-300 delay-100 pr-1.5 ${
+                foodRainActive
+                  ? "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+                  : "opacity-0 group-hover:opacity-100"
+              }`}>
+                {foodRainActive ? "Clear plates" : "Make it rain"}
               </span>
             </button>
           )}
@@ -313,7 +321,7 @@ function HomeContent() {
       ) : sorted.length === 0 && unreviewedPlaces.length === 0 ? (
         <div className="py-16 text-center">
           <p className="text-muted text-sm">
-            No {tab === "lunch" ? "lunch spots" : "cafes"} yet
+            No {tab === "lunch" ? "lunch spots" : tab === "cafe" ? "cafés" : "sweets spots"} yet
           </p>
           <p className="text-muted text-xs mt-1">Be the first to add one</p>
         </div>
@@ -355,7 +363,7 @@ function HomeContent() {
                 onDeleteReview={handleDeleteReview}
                 onAddReview={() => setReviewingPlace(place)}
                 onDeletePlace={() => handleDeletePlace(place)}
-                onMovePlace={() => handleMovePlace(place)}
+                onMovePlace={(target) => handleMovePlace(place, target)}
                 onRenamePlace={() => handleRenamePlace(place)}
               />
             ))}
@@ -382,7 +390,7 @@ function HomeContent() {
                     onDeleteReview={handleDeleteReview}
                     onAddReview={() => setReviewingPlace(place)}
                     onDeletePlace={() => handleDeletePlace(place)}
-                    onMovePlace={() => handleMovePlace(place)}
+                    onMovePlace={(target) => handleMovePlace(place, target)}
                     onRenamePlace={() => handleRenamePlace(place)}
                     unreviewed
                   />
@@ -409,7 +417,7 @@ function HomeContent() {
           cachedPassword={officePassword}
           onPasswordVerified={(pw) => {
             setOfficePassword(pw);
-            sessionStorage.setItem("office_password", pw);
+            localStorage.setItem("office_password", pw);
           }}
         />
       )}
@@ -421,7 +429,7 @@ function HomeContent() {
           cachedPassword={officePassword}
           onPasswordVerified={(pw) => {
             setOfficePassword(pw);
-            sessionStorage.setItem("office_password", pw);
+            localStorage.setItem("office_password", pw);
           }}
           existingPlace={reviewingPlace}
         />

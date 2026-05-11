@@ -26,7 +26,7 @@ interface PlaceTableProps {
   onDeleteReview: (review: Review) => void;
   onAddReview: (place: PlaceWithStats) => void;
   onDeletePlace: (place: PlaceWithStats) => void;
-  onMovePlace: (place: PlaceWithStats) => void;
+  onMovePlace: (place: PlaceWithStats, target: string) => void;
   onRenamePlace: (place: PlaceWithStats) => void;
   unreviewedPlaces?: PlaceWithStats[];
 }
@@ -102,7 +102,7 @@ export default function PlaceTable({
               onDeleteReview={onDeleteReview}
               onAddReview={() => onAddReview(place)}
               onDeletePlace={() => onDeletePlace(place)}
-              onMovePlace={() => onMovePlace(place)}
+              onMovePlace={(target) => onMovePlace(place, target)}
               onRenamePlace={() => onRenamePlace(place)}
             />
           ))}
@@ -133,7 +133,7 @@ export default function PlaceTable({
                   onDeleteReview={onDeleteReview}
                   onAddReview={() => onAddReview(place)}
                   onDeletePlace={() => onDeletePlace(place)}
-                  onMovePlace={() => onMovePlace(place)}
+                  onMovePlace={(target) => onMovePlace(place, target)}
                   onRenamePlace={() => onRenamePlace(place)}
                   unreviewed
                 />
