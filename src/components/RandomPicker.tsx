@@ -218,7 +218,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
       </div>
 
       {/* ===== MOBILE ===== */}
-      <div className="sm:hidden bg-border/20 border border-border/40 rounded-xl p-3 overflow-hidden">
+      <div className="sm:hidden bg-border/20 border border-border/40 rounded-xl p-3 overflow-hidden" style={{ minHeight: "88px" }}>
         {state === "idle" && (
           <div className="flex flex-col gap-3">
             {/* Filter row */}
@@ -273,7 +273,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
         )}
 
         {(state === "spinning" || state === "result") && (
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3 h-full justify-center">
             {/* Reel / Result */}
             <div className="flex items-center gap-3">
               {backButton}
