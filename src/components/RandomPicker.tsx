@@ -21,6 +21,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
   const [spinBlur, setSpinBlur] = useState(0);
   const spinRef = useRef<number>(0);
   const spinStartRef = useRef<number>(0);
+  const settleTimerRef = useRef<number>(0);
 
   const eligible = filterByWalk
     ? places.filter((p) => p.walk_minutes <= maxWalk)
@@ -38,6 +39,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
 
   const handleSpin = useCallback(() => {
     if (eligible.length === 0) return;
+    if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
     const names = buildSpinList();
     const winner = eligible[Math.floor(Math.random() * eligible.length)];
     const winIdx = names.length - 5;
@@ -66,7 +68,10 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
         spinRef.current = requestAnimationFrame(animate);
       } else {
         setSpinBlur(0);
-        setState("result");
+        setSpinOffset(totalDistance);
+        settleTimerRef.current = window.setTimeout(() => {
+          setState("result");
+        }, 300);
       }
     };
     spinRef.current = requestAnimationFrame(animate);
@@ -74,6 +79,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
 
   const handleBack = () => {
     if (spinRef.current) cancelAnimationFrame(spinRef.current);
+    if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
     setState("idle");
     setPickedPlace(null);
     setSpinNames([]);
@@ -84,6 +90,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
   useEffect(() => {
     return () => {
       if (spinRef.current) cancelAnimationFrame(spinRef.current);
+      if (settleTimerRef.current) clearTimeout(settleTimerRef.current);
     };
   }, []);
 
@@ -101,7 +108,7 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
       <div
         className="absolute left-0 right-0"
         style={{
-          transform: `translateY(${-spinOffset + 12}px)`,
+          transform: `translateY(${-spinOffset}px)`,
           filter: spinBlur > 0.5 ? `blur(${spinBlur}px)` : "none",
         }}
       >
@@ -145,76 +152,92 @@ export default function RandomPicker({ places, onSelect }: RandomPickerProps) {
     </button>
   );
 
-  const walkLabel = (active: boolean) => (
-    <span className={`text-xs uppercase tracking-widest font-medium transition-colors ${
-      active ? "text-fg" : "text-muted/40"
-    }`} />
-  );
-  void walkLabel;
-
   return (
     <>
       {/* ===== DESKTOP ===== */}
-      <div className="hidden sm:block bg-border/20 border border-border/40 rounded-lg px-3 py-1 overflow-hidden flex-1">
-        <div className="flex items-center gap-3 h-full">
-          {(state === "result" || state === "spinning") && backButton}
-
-          {state === "idle" && (
-            <>
-              <div className="flex items-center gap-2">
-                <span className={`text-xs uppercase tracking-widest font-medium transition-colors ${
-                  filterByWalk ? "text-fg" : "text-muted/40"
-                }`}>Under</span>
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => setMaxWalk((v) => Math.min(v + 1, 60))}
-                    className={`text-[10px] leading-none transition-colors ${
-                      filterByWalk ? "text-fg/70 hover:text-fg" : "text-muted/30"
-                    }`}
-                    disabled={!filterByWalk}
-                  >▲</button>
-                  <span className={`text-sm font-semibold font-mono tabular-nums transition-colors ${
-                    filterByWalk ? "text-fg" : "text-muted/40"
-                  }`}>{maxWalk}</span>
-                  <button
-                    onClick={() => setMaxWalk((v) => Math.max(v - 1, 1))}
-                    className={`text-[10px] leading-none transition-colors ${
-                      filterByWalk ? "text-fg/70 hover:text-fg" : "text-muted/30"
-                    }`}
-                    disabled={!filterByWalk}
-                  >▼</button>
-                </div>
-                <span className={`text-xs uppercase tracking-widest font-medium transition-colors ${
-                  filterByWalk ? "text-fg" : "text-muted/40"
-                }`}>min walk</span>
-              </div>
-              {walkToggle}
+      <div className="hidden sm:block bg-border/20 border border-border/40 rounded-lg overflow-hidden flex-1">
+        {state === "idle" ? (
+          <div className="flex items-center gap-2 h-full px-2">
+            <div className="flex items-center gap-1.5 pl-1">
               <span className={`text-xs uppercase tracking-widest font-medium transition-colors ${
-                filterByWalk ? "text-muted/40" : "text-fg"
-              }`}>Doesn&apos;t Matter</span>
-            </>
-          )}
-
-          {(state === "spinning" || state === "result") && (
-            <div className="flex-1 flex items-center justify-center min-w-0">
-              {state === "spinning" ? spinReel : (
+                filterByWalk ? "text-fg" : "text-muted/40"
+              }`}>Under</span>
+              <button
+                onClick={() => setMaxWalk((v) => Math.max(v - 1, 1))}
+                disabled={!filterByWalk}
+                className={`w-5 h-5 flex items-center justify-center rounded text-xs transition-colors ${
+                  filterByWalk ? "text-fg/70 hover:text-fg hover:bg-border/40" : "text-muted/30"
+                }`}
+              >−</button>
+              <span className={`text-sm font-semibold font-mono tabular-nums transition-colors ${
+                filterByWalk ? "text-fg" : "text-muted/40"
+              }`}>{maxWalk}</span>
+              <button
+                onClick={() => setMaxWalk((v) => Math.min(v + 1, 60))}
+                disabled={!filterByWalk}
+                className={`w-5 h-5 flex items-center justify-center rounded text-xs transition-colors ${
+                  filterByWalk ? "text-fg/70 hover:text-fg hover:bg-border/40" : "text-muted/30"
+                }`}
+              >+</button>
+              <span className={`text-xs uppercase tracking-widest font-medium transition-colors ${
+                filterByWalk ? "text-fg" : "text-muted/40"
+              }`}>min walk</span>
+            </div>
+            {walkToggle}
+            <span className={`text-xs uppercase tracking-widest font-medium transition-colors ${
+              filterByWalk ? "text-muted/40" : "text-fg"
+            }`}>Doesn&apos;t Matter</span>
+            <div className="flex-1" />
+            <button
+              onClick={handleSpin}
+              disabled={eligible.length === 0}
+              className="px-4 py-1.5 text-xs font-medium uppercase tracking-widest bg-fg text-bg rounded-md hover:opacity-90 disabled:opacity-40 transition-opacity shrink-0"
+            >
+              Choose for me
+            </button>
+          </div>
+        ) : (
+          <div className="relative h-full">
+            {state === "spinning" && (
+              <div className="absolute inset-0 overflow-hidden" style={{ perspective: "300px" }}>
+                <div
+                  className="absolute inset-x-0 top-1/2"
+                  style={{
+                    transform: `translateY(${-spinOffset - 16}px)`,
+                    filter: spinBlur > 0.5 ? `blur(${spinBlur}px)` : "none",
+                  }}
+                >
+                  {spinNames.map((name, i) => (
+                    <div
+                      key={i}
+                      className="h-8 flex items-center justify-center text-sm font-medium text-fg"
+                    >
+                      {name}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            {state === "result" && (
+              <div className="absolute inset-0 flex items-center justify-center">
                 <button onClick={handleResultClick} className="text-sm font-medium text-fg hover:underline cursor-pointer">
                   {pickedPlace?.name}
                 </button>
-              )}
+              </div>
+            )}
+            <div className="relative flex items-center h-full px-2 gap-2">
+              {backButton}
+              <div className="flex-1" />
+              <button
+                onClick={state === "result" ? handleSpin : undefined}
+                disabled={eligible.length === 0 || state === "spinning"}
+                className="px-4 py-1.5 text-xs font-medium uppercase tracking-widest bg-fg text-bg rounded-md hover:opacity-90 disabled:opacity-40 transition-opacity shrink-0"
+              >
+                Spin again
+              </button>
             </div>
-          )}
-
-          {state === "idle" && <div className="flex-1" />}
-
-          <button
-            onClick={state === "idle" || state === "result" ? handleSpin : undefined}
-            disabled={eligible.length === 0 || state === "spinning"}
-            className="px-4 py-1.5 text-xs font-medium uppercase tracking-widest bg-fg text-bg rounded-md hover:opacity-90 disabled:opacity-40 transition-opacity shrink-0"
-          >
-            {state === "idle" ? "Choose for me" : "Spin again"}
-          </button>
-        </div>
+          </div>
+        )}
       </div>
 
       {/* ===== MOBILE ===== */}
