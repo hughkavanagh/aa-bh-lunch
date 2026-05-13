@@ -21,6 +21,7 @@ function extractSearchQuery(url: string): string | null {
   const patterns = [
     /place\/([^/@]+)/,
     /search\/([^/@]+)/,
+    /[?&]q=([^&]+)/,
     /query=([^&]+)/,
   ];
   for (const pattern of patterns) {

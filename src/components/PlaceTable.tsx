@@ -53,14 +53,14 @@ export default function PlaceTable({
     <div className="overflow-x-auto">
       <table className="w-full" style={{ minWidth: "800px" }}>
         <colgroup>
-          <col style={{ width: "35%" }} />
+          <col style={{ width: "40%" }} />
           <col />
           <col />
           <col />
           <col />
           <col />
-          <col style={{ width: "80px" }} />
-          <col style={{ width: "48px" }} />
+          <col style={{ width: "70px" }} />
+          <col style={{ width: "36px" }} />
         </colgroup>
         <thead>
           <tr className="border-b-2 border-border">
@@ -68,7 +68,7 @@ export default function PlaceTable({
               <th
                 key={col.label}
                 onClick={() => onSort(col.field)}
-                className="py-3 px-5 text-xs font-medium tracking-widest uppercase text-muted whitespace-nowrap cursor-pointer hover:text-fg select-none text-left"
+                className="py-3 px-3 text-xs font-medium tracking-widest uppercase text-muted whitespace-nowrap cursor-pointer hover:text-fg select-none text-left"
               >
                 {col.label}
                 <span

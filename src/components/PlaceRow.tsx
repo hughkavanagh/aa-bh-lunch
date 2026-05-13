@@ -45,7 +45,7 @@ export default function PlaceRow({
           highlighted ? "bg-border/30 animate-pulse" : ""
         }`}
       >
-        <td className="py-3 px-5">
+        <td className="py-3 px-3">
           <a
             href={place.google_maps_url}
             target="_blank"
@@ -56,31 +56,31 @@ export default function PlaceRow({
             {place.name}
           </a>
         </td>
-        <td className="py-3 px-5 font-mono">
+        <td className="py-3 px-3 font-mono">
           {unreviewed ? (
             <span className="text-muted/40 text-xs tracking-wider">UNREVIEWED</span>
           ) : (
             place.review_count > 0 ? place.avg_rating.toFixed(1) : "—"
           )}
         </td>
-        <td className="py-3 px-5 font-mono">
+        <td className="py-3 px-3 font-mono">
           {unreviewed ? (
             <span className="text-muted/40 text-xs tracking-wider">UNREVIEWED</span>
           ) : (
             place.review_count > 0 ? formatPrice(place.avg_price) : "—"
           )}
         </td>
-        <td className="py-3 px-5 font-mono whitespace-nowrap">
+        <td className="py-3 px-3 font-mono whitespace-nowrap">
           {place.walk_minutes} min
         </td>
-        <td className="py-3 px-5 font-mono">
+        <td className="py-3 px-3 font-mono">
           {unreviewed ? (
             <span className="text-muted/40 text-xs tracking-wider">UNREVIEWED</span>
           ) : (
             place.review_count > 0 ? place.rating_per_dollar.toFixed(1) : "—"
           )}
         </td>
-        <td className="py-3 pl-5 pr-1 text-muted text-sm">
+        <td className="py-3 pl-3 pr-1 text-muted text-sm">
           {place.review_count}
         </td>
         <td className="py-3 pl-1 pr-2">
@@ -95,7 +95,7 @@ export default function PlaceRow({
           </button>
         </td>
         {canExpand ? (
-          <td className="py-3 pl-4 pr-2 text-muted">
+          <td className="py-3 pl-2 pr-1 text-muted">
             <span
               className={`inline-block transition-transform ${
                 expanded ? "rotate-90" : ""

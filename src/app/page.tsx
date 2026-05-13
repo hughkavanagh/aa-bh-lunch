@@ -302,7 +302,7 @@ function HomeContent() {
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-stretch gap-4 mb-6">
         <Tabs active={tab} onChange={handleTabChange} />
         <RandomPicker places={places} onSelect={handleRandomSelect} />
         <div className="sm:hidden">
