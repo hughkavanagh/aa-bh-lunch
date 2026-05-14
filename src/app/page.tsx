@@ -111,7 +111,7 @@ function HomeContent() {
       setSortDirection((d) => (d === "asc" ? "desc" : "asc"));
     } else {
       setSortField(field);
-      setSortDirection(field === "name" || field === "walk_minutes" ? "asc" : "desc");
+      setSortDirection(field === "name" || field === "walk_minutes" || field === "avg_price" ? "asc" : "desc");
     }
   };
 
